@@ -624,7 +624,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameObjectPool
   gameObjectToPool: {fileID: 1523099696507926454, guid: d045ae8711f97444cafb066e36b7e27d, type: 3}
   pool: []
-  poolDefaultSize: 5
+  poolDefaultSize: 10
 --- !u!4 &2108344536
 Transform:
   m_ObjectHideFlags: 0
