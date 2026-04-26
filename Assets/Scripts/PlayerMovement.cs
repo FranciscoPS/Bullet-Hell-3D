@@ -3,26 +3,47 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private float moveSpeed = 10f;
-    private Rigidbody rb;
-    private PlayerInput playerInput;
-    private Vector2 input;
+    [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private Gun gun;
 
-    private void Start()
+    private Rigidbody rb;
+    private InputAction moveAction;
+    private InputAction shootAction;
+
+    private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        playerInput = GetComponent<PlayerInput>();
+        rb.freezeRotation = true;
+
+        PlayerInput playerInput = GetComponent<PlayerInput>();
+        moveAction = playerInput.actions["Move"];
+        shootAction = playerInput.actions["Shoot"];
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        input = playerInput.actions["Move"].ReadValue<Vector2>();
-        Debug.Log(input);
+        shootAction.performed += OnShoot;
+    }
+
+    private void OnDisable()
+    {
+        shootAction.performed -= OnShoot;
+    }
+
+    private void OnShoot(InputAction.CallbackContext context)
+    {
+        gun?.Shoot();
     }
 
     private void FixedUpdate()
     {
-        rb.AddForce(new Vector3(input.x, 0f, input.y) * moveSpeed);
-    }
+        Vector2 moveInput = moveAction.ReadValue<Vector2>();
+        Vector3 moveDirection = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
 
+        rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
+
+        if (moveDirection.magnitude >= 0.1f)
+            transform.rotation = Quaternion.LookRotation(moveDirection);
+    }
 }
+
