@@ -548,6 +548,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 3824065328073621120, guid: 971fe06eaabbb844db74543b39c853f2, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.1955947
+      objectReference: {fileID: 0}
+    - target: {fileID: 3824065328073621120, guid: 971fe06eaabbb844db74543b39c853f2, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.23097971
+      objectReference: {fileID: 0}
+    - target: {fileID: 3824065328073621120, guid: 971fe06eaabbb844db74543b39c853f2, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.53678
+      objectReference: {fileID: 0}
+    - target: {fileID: 3824065328073621120, guid: 971fe06eaabbb844db74543b39c853f2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0000000074506
+      objectReference: {fileID: 0}
+    - target: {fileID: 3824065328073621120, guid: 971fe06eaabbb844db74543b39c853f2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.454
+      objectReference: {fileID: 0}
+    - target: {fileID: 3824065328073621120, guid: 971fe06eaabbb844db74543b39c853f2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.652
+      objectReference: {fileID: 0}
     - target: {fileID: 9077643109031598182, guid: 971fe06eaabbb844db74543b39c853f2, type: 3}
       propertyPath: m_Camera
       value: 
