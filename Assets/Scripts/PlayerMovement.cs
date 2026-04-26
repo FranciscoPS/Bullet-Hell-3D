@@ -4,9 +4,11 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private Gun gun;
 
     private Rigidbody rb;
     private InputAction moveAction;
+    private InputAction shootAction;
 
     private void Awake()
     {
@@ -15,6 +17,22 @@ public class PlayerMovement : MonoBehaviour
 
         PlayerInput playerInput = GetComponent<PlayerInput>();
         moveAction = playerInput.actions["Move"];
+        shootAction = playerInput.actions["Shoot"];
+    }
+
+    private void OnEnable()
+    {
+        shootAction.performed += OnShoot;
+    }
+
+    private void OnDisable()
+    {
+        shootAction.performed -= OnShoot;
+    }
+
+    private void OnShoot(InputAction.CallbackContext context)
+    {
+        gun?.Shoot();
     }
 
     private void FixedUpdate()

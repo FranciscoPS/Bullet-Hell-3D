@@ -174,6 +174,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 77c9d5ee-fa71-4b1d-817e-204507a510f6
     m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 43dc27a9-e243-4568-8e7b-ec31456b38cc
+    m_ActionName: 'Player/Shoot[/Mouse/leftButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -192,6 +196,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 10
+  gun: {fileID: 8775708432994530195}
 --- !u!1 &5043762940699599108
 GameObject:
   m_ObjectHideFlags: 0
@@ -204,6 +209,7 @@ GameObject:
   - component: {fileID: 623988029535140894}
   - component: {fileID: 4024584603759368474}
   - component: {fileID: 8484079175334214378}
+  - component: {fileID: 8775708432994530195}
   m_Layer: 0
   m_Name: Gun
   m_TagString: Untagged
@@ -220,8 +226,8 @@ Transform:
   m_GameObject: {fileID: 5043762940699599108}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.6, y: 0.448, z: 0}
-  m_LocalScale: {x: 1, y: 0.25809, z: 0.2735}
+  m_LocalPosition: {x: 0.445, y: 0, z: 0.546}
+  m_LocalScale: {x: 0.25956863, y: 0.28429, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6170701856605060176}
@@ -305,6 +311,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8775708432994530195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043762940699599108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39e3d1f0f02634273a7ce37577eefc03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gun
+  pool: {fileID: 0}
+  shootForce: 150
+  muzzle: {fileID: 6170701856605060176}
 --- !u!1 &8570627434870943748
 GameObject:
   m_ObjectHideFlags: 0
@@ -317,7 +338,7 @@ GameObject:
   m_Layer: 0
   m_Name: Muzzle
   m_TagString: Untagged
-  m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -330,7 +351,7 @@ Transform:
   m_GameObject: {fileID: 8570627434870943748}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.489, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.505}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
