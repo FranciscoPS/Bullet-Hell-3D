@@ -4,28 +4,41 @@ public class Gun : MonoBehaviour
 {
     [SerializeField] private GameObjectPool pool;
     [SerializeField] private float shootForce = 150f;
+    [SerializeField] private float damage = 10f;
     [SerializeField] private Transform muzzle;
 
-    private Collider playerCollider;
+    private Collider ownerCollider;
 
     private void Awake()
     {
-        playerCollider = GetComponentInParent<Collider>();
+        ownerCollider = GetComponentInParent<Collider>();
     }
 
-    public void Shoot()
+    public void SetPool(GameObjectPool bulletPool)
+    {
+        pool = bulletPool;
+    }
+
+    public void Shoot(Vector3 direction)
     {
         Transform spawnPoint = muzzle != null ? muzzle : transform;
         GameObject projectile = pool.GetGameObjectFromPool(spawnPoint.position);
 
-        if (playerCollider != null)
+        projectile.GetComponent<Projectile>()?.SetDamage(damage);
+
+        if (ownerCollider != null)
         {
             Collider projectileCollider = projectile.GetComponent<Collider>();
             if (projectileCollider != null)
-                Physics.IgnoreCollision(projectileCollider, playerCollider);
+                Physics.IgnoreCollision(projectileCollider, ownerCollider);
         }
 
         Rigidbody rb = projectile.GetComponent<Rigidbody>();
-        rb?.AddForce(spawnPoint.forward * shootForce);
+        rb?.AddForce(direction * shootForce);
+    }
+
+    public void Shoot()
+    {
+        Shoot(transform.forward);
     }
 }

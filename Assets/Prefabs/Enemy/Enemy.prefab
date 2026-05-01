@@ -13,10 +13,11 @@ GameObject:
   - component: {fileID: 3926120543736355536}
   - component: {fileID: 8872778424799118068}
   - component: {fileID: 8196953144286460870}
-  - component: {fileID: 9077643109031598182}
-  - component: {fileID: 1569964255943115352}
-  m_Layer: 0
-  m_Name: Player
+  - component: {fileID: 6405522700551305029}
+  - component: {fileID: 4004850664363954388}
+  - component: {fileID: 3409203720244767959}
+  m_Layer: 6
+  m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -71,7 +72,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 440ba548f2f5e4ba8a8444de1dbf13f7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -140,12 +141,12 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 84
   m_CollisionDetection: 0
---- !u!114 &9077643109031598182
+--- !u!114 &6405522700551305029
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -154,36 +155,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1206400234304264492}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Script: {fileID: 11500000, guid: 56dcd4f0a602e4f2689d7e1e2694116c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
-  m_Actions: {fileID: -944628639613478452, guid: 7dfd1e93cf04115409d9308efa083e26, type: 3}
-  m_NotificationBehavior: 2
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents:
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 77c9d5ee-fa71-4b1d-817e-204507a510f6
-    m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 43dc27a9-e243-4568-8e7b-ec31456b38cc
-    m_ActionName: 'Player/Shoot[/Mouse/leftButton]'
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
---- !u!114 &1569964255943115352
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  moveSpeed: 4
+  shootRange: 8
+  projectilesPerBurst: 3
+  timeBetweenShots: 0.3
+  timeBetweenBursts: 1
+  shootForce: 120
+  muzzle: {fileID: 6170701856605060176}
+  pool: {fileID: 0}
+--- !u!114 &4004850664363954388
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -192,11 +175,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 1206400234304264492}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4254d42b83f179046980dac80e9fbede, type: 3}
+  m_Script: {fileID: 11500000, guid: 013a4236a19ed40669fe1551f6a91cea, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  moveSpeed: 10
-  gun: {fileID: 8775708432994530195}
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  maxHealth: 1
+--- !u!114 &3409203720244767959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206400234304264492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39e3d1f0f02634273a7ce37577eefc03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gun
+  pool: {fileID: 0}
+  shootForce: 150
+  damage: 10
+  muzzle: {fileID: 6170701856605060176}
 --- !u!1 &5043762940699599108
 GameObject:
   m_ObjectHideFlags: 0
@@ -208,9 +206,7 @@ GameObject:
   - component: {fileID: 3824065328073621120}
   - component: {fileID: 623988029535140894}
   - component: {fileID: 4024584603759368474}
-  - component: {fileID: 8484079175334214378}
-  - component: {fileID: 8775708432994530195}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -290,42 +286,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8484079175334214378
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5043762940699599108}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8775708432994530195
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5043762940699599108}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39e3d1f0f02634273a7ce37577eefc03, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Gun
-  pool: {fileID: 0}
-  shootForce: 150
-  muzzle: {fileID: 6170701856605060176}
 --- !u!1 &8570627434870943748
 GameObject:
   m_ObjectHideFlags: 0
@@ -335,7 +295,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6170701856605060176}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}

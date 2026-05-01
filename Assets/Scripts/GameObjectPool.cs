@@ -41,8 +41,12 @@ public class GameObjectPool : MonoBehaviour
 
     public GameObject GetGameObjectFromPool(Vector3 position)
     {
-        GameObject target = GetGameObjectFromPool();
+        GameObject target = pool.FirstOrDefault(go => !go.activeSelf);
+        if (target == null)
+            target = InstancePoolObject();
+
         target.transform.position = position;
+        target.SetActive(true);
         return target;
     }
 }
