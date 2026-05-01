@@ -211,7 +211,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gun
   pool: {fileID: 0}
-  shootForce: 800
+  shootForce: 700
   damage: 10
   fireRate: 3
   muzzle: {fileID: 6170701856605060176}
