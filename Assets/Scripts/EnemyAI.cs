@@ -7,6 +7,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float shootRange = 8f;
     [SerializeField] private int projectilesPerBurst = 3;
     [SerializeField] private float timeBetweenShots = 0.3f;
+    [SerializeField] private float timeBetweenBursts = 2f;
     [SerializeField] private float shootForce = 120f;
     [SerializeField] private Transform muzzle;
     [SerializeField] private GameObjectPool pool;
@@ -15,6 +16,7 @@ public class EnemyAI : MonoBehaviour
     private Rigidbody rb;
     private Collider enemyCollider;
     private bool isShooting = false;
+    private float nextBurstTime = 0f;
 
     private void Awake()
     {
@@ -49,7 +51,8 @@ public class EnemyAI : MonoBehaviour
         else
         {
             rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
-            StartCoroutine(ShootBurst());
+            if (!isShooting && Time.time >= nextBurstTime)
+                StartCoroutine(ShootBurst());
         }
     }
 
@@ -74,6 +77,7 @@ public class EnemyAI : MonoBehaviour
             yield return new WaitForSeconds(timeBetweenShots);
         }
 
+        nextBurstTime = Time.time + timeBetweenBursts;
         isShooting = false;
     }
 

@@ -14,9 +14,10 @@ GameObject:
   - component: {fileID: 8872778424799118068}
   - component: {fileID: 8196953144286460870}
   - component: {fileID: 6405522700551305029}
-  m_Layer: 0
+  - component: {fileID: 4004850664363954388}
+  m_Layer: 6
   m_Name: Enemy
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -160,9 +161,23 @@ MonoBehaviour:
   shootRange: 8
   projectilesPerBurst: 3
   timeBetweenShots: 0.3
+  timeBetweenBursts: 1
   shootForce: 120
   muzzle: {fileID: 6170701856605060176}
   pool: {fileID: 0}
+--- !u!114 &4004850664363954388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206400234304264492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 013a4236a19ed40669fe1551f6a91cea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  maxHealth: 1
 --- !u!1 &5043762940699599108
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,6 +306,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Gun
   pool: {fileID: 0}
   shootForce: 150
+  damage: 10
   muzzle: {fileID: 6170701856605060176}
 --- !u!1 &8570627434870943748
 GameObject:
