@@ -8,10 +8,8 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private int projectilesPerBurst = 3;
     [SerializeField] private float timeBetweenShots = 0.3f;
     [SerializeField] private float timeBetweenBursts = 2f;
-    [SerializeField] private float shootForce = 120f;
-    [SerializeField] private Transform muzzle;
-    [SerializeField] private GameObjectPool pool;
 
+    private Gun gun;
     private Transform player;
     private Rigidbody rb;
     private Collider enemyCollider;
@@ -23,11 +21,12 @@ public class EnemyAI : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         enemyCollider = GetComponent<Collider>();
+        gun = GetComponent<Gun>();
     }
 
     public void SetPool(GameObjectPool bulletPool)
     {
-        pool = bulletPool;
+        gun.SetPool(bulletPool);
     }
 
     private void Start()
@@ -73,33 +72,16 @@ public class EnemyAI : MonoBehaviour
 
         for (int i = 0; i < projectilesPerBurst; i++)
         {
-            FireProjectile();
+            if (player != null)
+            {
+                Vector3 direction = (player.position - transform.position).normalized;
+                direction.y = 0f;
+                gun.Shoot(direction);
+            }
             yield return new WaitForSeconds(timeBetweenShots);
         }
 
         nextBurstTime = Time.time + timeBetweenBursts;
         isShooting = false;
-    }
-
-    private void FireProjectile()
-    {
-        if (player == null || pool == null) return;
-
-        Transform spawnPoint = muzzle != null ? muzzle : transform;
-
-        Vector3 directionToPlayer = (player.position - spawnPoint.position).normalized;
-        spawnPoint.rotation = Quaternion.LookRotation(directionToPlayer);
-
-        GameObject projectile = pool.GetGameObjectFromPool(spawnPoint.position);
-
-        if (enemyCollider != null)
-        {
-            Collider projectileCollider = projectile.GetComponent<Collider>();
-            if (projectileCollider != null)
-                Physics.IgnoreCollision(projectileCollider, enemyCollider);
-        }
-
-        Rigidbody projRb = projectile.GetComponent<Rigidbody>();
-        projRb?.AddForce(directionToPlayer * shootForce);
     }
 }

@@ -23,12 +23,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnEnable()
     {
-        shootAction.performed += OnShoot;
+        shootAction.Enable();
     }
 
     private void OnDisable()
     {
-        shootAction.performed -= OnShoot;
+        shootAction.Disable();
     }
 
     public void SetGun(Gun assignedGun)
@@ -36,14 +36,14 @@ public class PlayerMovement : MonoBehaviour
         gun = assignedGun;
     }
 
-    private void OnShoot(InputAction.CallbackContext context)
-    {
-        gun?.Shoot(aimDirection);
-    }
+    private void OnShoot(InputAction.CallbackContext context) { }
 
     private void Update()
     {
         AimAtMouse();
+
+        if (shootAction.IsPressed())
+            gun?.Shoot(aimDirection);
     }
 
     private void AimAtMouse()

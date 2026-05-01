@@ -161,11 +161,8 @@ MonoBehaviour:
   moveSpeed: 4
   shootRange: 8
   projectilesPerBurst: 3
-  timeBetweenShots: 0.3
+  timeBetweenShots: 0.1
   timeBetweenBursts: 1
-  shootForce: 120
-  muzzle: {fileID: 6170701856605060176}
-  pool: {fileID: 0}
 --- !u!114 &4004850664363954388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -192,8 +189,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gun
   pool: {fileID: 0}
-  shootForce: 150
+  shootForce: 500
   damage: 10
+  fireRate: 0
   muzzle: {fileID: 6170701856605060176}
 --- !u!1 &5043762940699599108
 GameObject:

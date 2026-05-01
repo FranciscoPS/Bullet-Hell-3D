@@ -5,9 +5,11 @@ public class Gun : MonoBehaviour
     [SerializeField] private GameObjectPool pool;
     [SerializeField] private float shootForce = 150f;
     [SerializeField] private float damage = 10f;
+    [SerializeField] private float fireRate = 8f;
     [SerializeField] private Transform muzzle;
 
     private Collider ownerCollider;
+    private float lastShootTime = -Mathf.Infinity;
 
     private void Awake()
     {
@@ -21,6 +23,10 @@ public class Gun : MonoBehaviour
 
     public void Shoot(Vector3 direction)
     {
+        if (pool == null) return;
+        if (fireRate > 0 && Time.time - lastShootTime < 1f / fireRate) return;
+        lastShootTime = Time.time;
+
         Transform spawnPoint = muzzle != null ? muzzle : transform;
         GameObject projectile = pool.GetGameObjectFromPool(spawnPoint.position);
 
