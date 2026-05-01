@@ -257,7 +257,7 @@ Transform:
   m_GameObject: {fileID: 105711659}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1945,7 +1945,7 @@ Transform:
   m_GameObject: {fileID: 766195709}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 16.49, y: 0, z: 0}
+  m_LocalPosition: {x: 16.49, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1965,6 +1965,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   enemyPrefab: {fileID: 1206400234304264492, guid: aa7d9a7bb7ae94837b96a6efee5c4381, type: 3}
   enemyBulletPool: {fileID: 1318542704}
+  spawnInterval: 3
 --- !u!1 &775227977
 GameObject:
   m_ObjectHideFlags: 0

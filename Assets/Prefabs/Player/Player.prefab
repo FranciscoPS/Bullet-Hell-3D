@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8196953144286460870}
   - component: {fileID: 9077643109031598182}
   - component: {fileID: 1569964255943115352}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -143,7 +143,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 84
   m_CollisionDetection: 0
 --- !u!114 &9077643109031598182
 MonoBehaviour:
@@ -210,7 +210,7 @@ GameObject:
   - component: {fileID: 4024584603759368474}
   - component: {fileID: 8484079175334214378}
   - component: {fileID: 8775708432994530195}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -325,6 +325,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Gun
   pool: {fileID: 0}
   shootForce: 150
+  damage: 10
   muzzle: {fileID: 6170701856605060176}
 --- !u!1 &8570627434870943748
 GameObject:
@@ -335,7 +336,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6170701856605060176}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
