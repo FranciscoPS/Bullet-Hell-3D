@@ -9,7 +9,7 @@ public class PlayerSpawner : MonoBehaviour
     {
         GameObject instance = Instantiate(playerPrefab, transform.position, transform.rotation);
 
-        Gun gun = instance.GetComponentInChildren<Gun>();
+        Gun gun = instance.GetComponent<Gun>();
         gun.SetPool(bulletPool);
         instance.GetComponent<PlayerMovement>().SetGun(gun);
     }
