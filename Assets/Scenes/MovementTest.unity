@@ -977,6 +977,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3149741456977342621, guid: 8115fa30f44094d0cad2cad6cd1eb99d, type: 3}
+      propertyPath: m_ForceMeshLod
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3149741456977342621, guid: 8115fa30f44094d0cad2cad6cd1eb99d, type: 3}
+      propertyPath: m_MeshLodSelectionBias
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3358141653828868138, guid: 8115fa30f44094d0cad2cad6cd1eb99d, type: 3}
+      propertyPath: m_ForceMeshLod
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3358141653828868138, guid: 8115fa30f44094d0cad2cad6cd1eb99d, type: 3}
+      propertyPath: m_MeshLodSelectionBias
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4550300336385891745, guid: 8115fa30f44094d0cad2cad6cd1eb99d, type: 3}
       propertyPath: m_Name
       value: Boss
@@ -1027,6 +1043,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4652616220258453309, guid: 8115fa30f44094d0cad2cad6cd1eb99d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120801708693873795, guid: 8115fa30f44094d0cad2cad6cd1eb99d, type: 3}
+      propertyPath: m_ForceMeshLod
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120801708693873795, guid: 8115fa30f44094d0cad2cad6cd1eb99d, type: 3}
+      propertyPath: m_MeshLodSelectionBias
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7276845456468011261, guid: 8115fa30f44094d0cad2cad6cd1eb99d, type: 3}
