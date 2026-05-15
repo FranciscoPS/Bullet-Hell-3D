@@ -2178,6 +2178,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Level 1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 26e6ad4dcdd96e341b77597d481e34e0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 945657114191510082, guid: 26e6ad4dcdd96e341b77597d481e34e0, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
@@ -3702,7 +3706,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 1
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
