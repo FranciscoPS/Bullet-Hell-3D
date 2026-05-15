@@ -122,6 +122,10 @@ MonoBehaviour:
   spiralRotationSpeed: 120
   spiralFireRate: 0.08
   bulletPool: {fileID: 0}
+  dashSpeed: 20
+  dashDuration: 1
+  dashDamage: 30
+  dashContactRadius: 1.5
 --- !u!114 &1153793795262775527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -134,7 +138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d9c35622feb54e419676f88bd553df2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossHealth
-  maxHealth: 300
+  maxHealth: 50
   onDeath:
     m_PersistentCalls:
       m_Calls: []

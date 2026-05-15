@@ -9,6 +9,8 @@ public class BossHealth : MonoBehaviour
 
     private float currentHealth;
 
+    public float HealthRatio => maxHealth > 0f ? currentHealth / maxHealth : 0f;
+
     private void Awake()
     {
         currentHealth = maxHealth;

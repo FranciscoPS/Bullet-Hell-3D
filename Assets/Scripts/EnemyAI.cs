@@ -73,12 +73,20 @@ public class EnemyAI : MonoBehaviour
     {
         isShooting = true;
 
+        if (gun == null)
+        {
+            isShooting = false;
+            yield break;
+        }
+
         for (int i = 0; i < projectilesPerBurst; i++)
         {
             if (player != null)
             {
-                Vector3 direction = (player.position - transform.position).normalized;
-                direction.y = 0f;
+                Vector3 diff = player.position - transform.position;
+                diff.y = 0f;
+                Vector3 direction = diff.sqrMagnitude > 0.001f ? diff.normalized : transform.forward;
+
                 gun.Shoot(direction);
             }
             yield return new WaitForSeconds(timeBetweenShots);
