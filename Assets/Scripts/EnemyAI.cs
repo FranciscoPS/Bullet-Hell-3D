@@ -49,7 +49,6 @@ public class EnemyAI : MonoBehaviour
         }
         else
         {
-            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
             if (!isShooting && Time.time >= nextBurstTime)
                 StartCoroutine(ShootBurst());
         }
@@ -59,8 +58,7 @@ public class EnemyAI : MonoBehaviour
     {
         Vector3 direction = (player.position - transform.position).normalized;
         direction.y = 0f;
-
-        rb.linearVelocity = new Vector3(direction.x * moveSpeed, rb.linearVelocity.y, direction.z * moveSpeed);
+        rb.MovePosition(transform.position + direction * moveSpeed * Time.fixedDeltaTime);
 
         if (direction != Vector3.zero)
             transform.rotation = Quaternion.LookRotation(direction);

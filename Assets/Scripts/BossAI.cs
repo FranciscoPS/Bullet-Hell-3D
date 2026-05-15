@@ -66,10 +66,7 @@ public class BossAI : MonoBehaviour
         }
 
         if (isAttacking)
-        {
-            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
             return;
-        }
 
         float distance = Vector3.Distance(transform.position, player.position);
 
@@ -79,8 +76,6 @@ public class BossAI : MonoBehaviour
         }
         else
         {
-            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
-
             if (Time.time >= nextAttackTime)
                 StartCoroutine(ExecuteRandomAttack());
         }
@@ -90,7 +85,7 @@ public class BossAI : MonoBehaviour
     {
         Vector3 dir = (player.position - transform.position).normalized;
         dir.y = 0f;
-        rb.linearVelocity = new Vector3(dir.x * moveSpeed, rb.linearVelocity.y, dir.z * moveSpeed);
+        rb.MovePosition(transform.position + dir * moveSpeed * Time.fixedDeltaTime);
 
         if (dir != Vector3.zero)
             transform.rotation = Quaternion.LookRotation(dir);

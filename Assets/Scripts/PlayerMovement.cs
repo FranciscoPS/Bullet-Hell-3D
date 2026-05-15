@@ -70,7 +70,8 @@ public class PlayerMovement : MonoBehaviour
         Vector2 moveInput = moveAction.ReadValue<Vector2>();
         Vector3 moveDirection = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
 
-        rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
+        if (moveDirection != Vector3.zero)
+            rb.MovePosition(transform.position + moveDirection * moveSpeed * Time.fixedDeltaTime);
     }
 }
 
