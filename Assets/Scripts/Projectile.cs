@@ -28,8 +28,18 @@ public class Projectile : MonoBehaviour
         EnemyHealth enemy = collision.gameObject.GetComponent<EnemyHealth>();
         if (enemy == null)
             enemy = collision.gameObject.GetComponentInParent<EnemyHealth>();
-
         enemy?.TakeDamage(damage);
+
+        BossHealth boss = collision.gameObject.GetComponent<BossHealth>();
+        if (boss == null)
+            boss = collision.gameObject.GetComponentInParent<BossHealth>();
+        boss?.TakeDamage(damage);
+
+        PlayerHealth player = collision.gameObject.GetComponent<PlayerHealth>();
+        if (player == null)
+            player = collision.gameObject.GetComponentInParent<PlayerHealth>();
+        player?.TakeDamage(damage);
+
         gameObject.SetActive(false);
     }
 
