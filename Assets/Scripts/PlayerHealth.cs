@@ -1,15 +1,13 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class BossHealth : MonoBehaviour
+public class PlayerHealth : MonoBehaviour
 {
-    [SerializeField] private float maxHealth = 300f;
+    [SerializeField] private float maxHealth = 100f;
 
     public UnityEvent onDeath;
 
     private float currentHealth;
-
-    public float HealthRatio => maxHealth > 0f ? currentHealth / maxHealth : 0f;
 
     private void Awake()
     {
@@ -20,7 +18,7 @@ public class BossHealth : MonoBehaviour
     {
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0f);
-        Debug.Log($"[BossHealth] Vida: {currentHealth} / {maxHealth}");
+        Debug.Log($"[PlayerHealth] Vida: {currentHealth} / {maxHealth}");
 
         if (currentHealth <= 0f)
             Die();
@@ -28,8 +26,8 @@ public class BossHealth : MonoBehaviour
 
     private void Die()
     {
-        Debug.Log("[BossHealth] El boss ha muerto.");
+        Debug.Log("[PlayerHealth] El jugador ha muerto.");
         onDeath?.Invoke();
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 }

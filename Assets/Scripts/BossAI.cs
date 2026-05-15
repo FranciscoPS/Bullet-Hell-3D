@@ -38,17 +38,26 @@ public class BossAI : MonoBehaviour
     [Header("Bullet Pool")]
     [SerializeField] private GameObjectPool bulletPool;
 
+    [Header("Phase 2 — Embestida")]
+    [SerializeField] private float dashSpeed         = 20f;
+    [SerializeField] private float dashDuration      = 0.4f;
+    [SerializeField] private float dashDamage        = 20f;
+    [SerializeField] private float dashContactRadius = 1.5f;
+
     private Transform player;
     private Rigidbody rb;
     private Collider  bossCollider;
     private bool      isAttacking    = false;
     private float     nextAttackTime = 0f;
+    private bool      isPhaseTwo        = false;
+    private bool      phaseTwoTriggered = false;
+    private BossHealth bossHealth;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-
         bossCollider = GetComponent<Collider>();
+        bossHealth   = GetComponent<BossHealth>();
 
         if (rb != null)
             rb.freezeRotation = true;
@@ -65,13 +74,15 @@ public class BossAI : MonoBehaviour
             player = playerObj.transform;
         }
 
-        if (isAttacking)
+        if (!phaseTwoTriggered && bossHealth != null && bossHealth.HealthRatio <= 0.5f)
         {
-            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
-            return;
+            isPhaseTwo        = true;
+            phaseTwoTriggered = true;
         }
 
-        float distance = Vector3.Distance(transform.position, player.position);
+        Vector3 toPlayer = player.position - transform.position;
+        toPlayer.y = 0f;
+        float distance = toPlayer.magnitude;
 
         if (distance > stopDistance)
         {
@@ -79,21 +90,22 @@ public class BossAI : MonoBehaviour
         }
         else
         {
-            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            if (toPlayer.sqrMagnitude > 0.001f)
+                transform.rotation = Quaternion.LookRotation(toPlayer.normalized);
 
-            if (Time.time >= nextAttackTime)
+            if (!isAttacking && Time.time >= nextAttackTime)
                 StartCoroutine(ExecuteRandomAttack());
         }
     }
 
     private void ChasePlayer()
     {
-        Vector3 dir = (player.position - transform.position).normalized;
-        dir.y = 0f;
-        rb.linearVelocity = new Vector3(dir.x * moveSpeed, rb.linearVelocity.y, dir.z * moveSpeed);
-
-        if (dir != Vector3.zero)
-            transform.rotation = Quaternion.LookRotation(dir);
+        Vector3 diff = player.position - transform.position;
+        diff.y = 0f;
+        if (diff.sqrMagnitude < 0.001f) return;
+        Vector3 dir = diff.normalized;
+        transform.position += dir * moveSpeed * Time.fixedDeltaTime;
+        transform.rotation = Quaternion.LookRotation(dir);
     }
 
     private IEnumerator ExecuteRandomAttack()
@@ -109,8 +121,45 @@ public class BossAI : MonoBehaviour
             case 2: yield return StartCoroutine(SpiralAttack());      break;
         }
 
+        if (isPhaseTwo)
+            yield return StartCoroutine(DashAttack());
+
         nextAttackTime = Time.time + timeBetweenAttacks;
         isAttacking    = false;
+    }
+
+    private IEnumerator DashAttack()
+    {
+        if (player == null) yield break;
+
+        Vector3 dashDir = player.position - transform.position;
+        dashDir.y = 0f;
+        if (dashDir.sqrMagnitude < 0.001f) yield break;
+        dashDir.Normalize();
+
+        bool damageDealt = false;
+        float elapsed    = 0f;
+
+        while (elapsed < dashDuration)
+        {
+            transform.position += dashDir * dashSpeed * Time.fixedDeltaTime;
+
+            if (!damageDealt && player != null)
+            {
+                Vector3 toPlayer = player.position - transform.position;
+                toPlayer.y = 0f;
+                if (toPlayer.magnitude <= dashContactRadius)
+                {
+                    PlayerHealth ph = player.GetComponent<PlayerHealth>()
+                                   ?? player.GetComponentInParent<PlayerHealth>();
+                    ph?.TakeDamage(dashDamage);
+                    damageDealt = true;
+                }
+            }
+
+            elapsed += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+        }
     }
 
     private IEnumerator CircularAttack()
