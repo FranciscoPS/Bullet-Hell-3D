@@ -65,10 +65,9 @@ public class BossAI : MonoBehaviour
             player = playerObj.transform;
         }
 
-        if (isAttacking)
-            return;
-
-        float distance = Vector3.Distance(transform.position, player.position);
+        Vector3 toPlayer = player.position - transform.position;
+        toPlayer.y = 0f;
+        float distance = toPlayer.magnitude;
 
         if (distance > stopDistance)
         {
@@ -76,19 +75,22 @@ public class BossAI : MonoBehaviour
         }
         else
         {
-            if (Time.time >= nextAttackTime)
+            if (toPlayer.sqrMagnitude > 0.001f)
+                transform.rotation = Quaternion.LookRotation(toPlayer.normalized);
+
+            if (!isAttacking && Time.time >= nextAttackTime)
                 StartCoroutine(ExecuteRandomAttack());
         }
     }
 
     private void ChasePlayer()
     {
-        Vector3 dir = (player.position - transform.position).normalized;
-        dir.y = 0f;
-        rb.MovePosition(transform.position + dir * moveSpeed * Time.fixedDeltaTime);
-
-        if (dir != Vector3.zero)
-            transform.rotation = Quaternion.LookRotation(dir);
+        Vector3 diff = player.position - transform.position;
+        diff.y = 0f;
+        if (diff.sqrMagnitude < 0.001f) return;
+        Vector3 dir = diff.normalized;
+        transform.position += dir * moveSpeed * Time.fixedDeltaTime;
+        transform.rotation = Quaternion.LookRotation(dir);
     }
 
     private IEnumerator ExecuteRandomAttack()

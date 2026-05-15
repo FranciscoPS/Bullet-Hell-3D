@@ -36,12 +36,14 @@ public class EnemyAI : MonoBehaviour
             player = playerObj.transform;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        if (player == null || isShooting)
+        if (player == null)
             return;
 
-        float distance = Vector3.Distance(transform.position, player.position);
+        Vector3 toPlayer = player.position - transform.position;
+        toPlayer.y = 0f;
+        float distance = toPlayer.magnitude;
 
         if (distance > shootRange)
         {
@@ -49,6 +51,9 @@ public class EnemyAI : MonoBehaviour
         }
         else
         {
+            if (toPlayer.sqrMagnitude > 0.001f)
+                transform.rotation = Quaternion.LookRotation(toPlayer.normalized);
+
             if (!isShooting && Time.time >= nextBurstTime)
                 StartCoroutine(ShootBurst());
         }
@@ -56,12 +61,12 @@ public class EnemyAI : MonoBehaviour
 
     private void ChasePlayer()
     {
-        Vector3 direction = (player.position - transform.position).normalized;
-        direction.y = 0f;
-        rb.MovePosition(transform.position + direction * moveSpeed * Time.fixedDeltaTime);
-
-        if (direction != Vector3.zero)
-            transform.rotation = Quaternion.LookRotation(direction);
+        Vector3 diff = player.position - transform.position;
+        diff.y = 0f;
+        if (diff.sqrMagnitude < 0.001f) return;
+        Vector3 direction = diff.normalized;
+        transform.position += direction * moveSpeed * Time.deltaTime;
+        transform.rotation = Quaternion.LookRotation(direction);
     }
 
     private IEnumerator ShootBurst()

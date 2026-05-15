@@ -71,7 +71,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 moveDirection = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
 
         if (moveDirection != Vector3.zero)
-            rb.MovePosition(transform.position + moveDirection * moveSpeed * Time.fixedDeltaTime);
+            transform.position += moveDirection * moveSpeed * Time.fixedDeltaTime;
     }
 }
 
