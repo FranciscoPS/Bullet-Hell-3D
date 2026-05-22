@@ -44,6 +44,11 @@ public class BossAI : MonoBehaviour
     [SerializeField] private float dashDamage        = 20f;
     [SerializeField] private float dashContactRadius = 1.5f;
 
+    [Header("Phase 3 — Proyectil Buscador")]
+    [SerializeField] private int   seekingProjectileCount = 5;
+    [SerializeField] private float seekingProjectileDuration = 3f;
+    [SerializeField] private float seekingProjectileSpeed = 15f;
+
     private Transform player;
     private Rigidbody rb;
     private Collider  bossCollider;
@@ -51,6 +56,8 @@ public class BossAI : MonoBehaviour
     private float     nextAttackTime = 0f;
     private bool      isPhaseTwo        = false;
     private bool      phaseTwoTriggered = false;
+    private bool      isPhaseThree       = false;
+    private bool      phaseThreeTriggered = false;
     private BossHealth bossHealth;
 
     private void Awake()
@@ -78,6 +85,14 @@ public class BossAI : MonoBehaviour
         {
             isPhaseTwo        = true;
             phaseTwoTriggered = true;
+            Debug.Log("<color=red>[BOSS] ¡FASE 2 ACTIVADA! — EMBESTIDA DESBLOQUEADA</color>");
+        }
+
+        if (!phaseThreeTriggered && bossHealth != null && bossHealth.HealthRatio <= 0.25f)
+        {
+            isPhaseThree = true;
+            phaseThreeTriggered = true;
+            Debug.Log("<color=red>[BOSS] ¡FASE 3 ACTIVADA! — PROYECTILES BUSCADORES DESBLOQUEADOS</color>");
         }
 
         Vector3 toPlayer = player.position - transform.position;
@@ -124,6 +139,9 @@ public class BossAI : MonoBehaviour
         if (isPhaseTwo)
             yield return StartCoroutine(DashAttack());
 
+        if (isPhaseThree)
+            yield return StartCoroutine(SeekingProjectileAttack());
+
         nextAttackTime = Time.time + timeBetweenAttacks;
         isAttacking    = false;
     }
@@ -159,6 +177,17 @@ public class BossAI : MonoBehaviour
 
             elapsed += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
+        }
+    }
+
+    private IEnumerator SeekingProjectileAttack()
+    {
+        if (player == null) yield break;
+
+        for (int i = 0; i < seekingProjectileCount; i++)
+        {
+            SpawnSeekingBullet();
+            yield return new WaitForSeconds(0.15f);
         }
     }
 
@@ -227,5 +256,29 @@ public class BossAI : MonoBehaviour
             Physics.IgnoreCollision(bulletCollider, bossCollider);
 
         bulletRb?.AddForce(direction * bulletForce);
+    }
+
+    private void SpawnSeekingBullet()
+    {
+        if (bulletPool == null || player == null) return;
+
+        GameObject bullet = bulletPool.GetGameObjectFromPool(transform.position);
+
+        Projectile proj = bullet.GetComponent<Projectile>();
+        if (proj != null)
+        {
+            proj.SetDamage(bulletDamage);
+            proj.SetSeeking(player, seekingProjectileDuration, seekingProjectileSpeed);
+        }
+
+        Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+
+        Collider bulletCollider = bullet.GetComponent<Collider>();
+        if (bulletCollider != null && bossCollider != null)
+            Physics.IgnoreCollision(bulletCollider, bossCollider);
+
+        Vector3 initialDir = (player.position - transform.position).normalized;
+        initialDir.y = 0f;
+        bulletRb?.AddForce(initialDir * (bulletForce * 0.5f));
     }
 }
