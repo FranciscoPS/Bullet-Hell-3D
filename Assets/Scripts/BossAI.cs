@@ -6,6 +6,7 @@ public class BossAI : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed    = 3f;
     [SerializeField] private float stopDistance = 8f;
+    [SerializeField] private float collisionSkin = 0.02f;
 
     [Header("Attack Settings")]
     [SerializeField] private float attackDuration      = 3f;
@@ -44,6 +45,11 @@ public class BossAI : MonoBehaviour
     [SerializeField] private float dashDamage        = 20f;
     [SerializeField] private float dashContactRadius = 1.5f;
 
+    [Header("Phase 3 — Proyectil Buscador")]
+    [SerializeField] private int   seekingProjectileCount = 5;
+    [SerializeField] private float seekingProjectileDuration = 3f;
+    [SerializeField] private float seekingProjectileSpeed = 15f;
+
     private Transform player;
     private Rigidbody rb;
     private Collider  bossCollider;
@@ -51,6 +57,8 @@ public class BossAI : MonoBehaviour
     private float     nextAttackTime = 0f;
     private bool      isPhaseTwo        = false;
     private bool      phaseTwoTriggered = false;
+    private bool      isPhaseThree       = false;
+    private bool      phaseThreeTriggered = false;
     private BossHealth bossHealth;
 
     private void Awake()
@@ -60,7 +68,11 @@ public class BossAI : MonoBehaviour
         bossHealth   = GetComponent<BossHealth>();
 
         if (rb != null)
+        {
+            rb.isKinematic = true;
             rb.freezeRotation = true;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+        }
     }
 
     private void Start() { }
@@ -78,6 +90,14 @@ public class BossAI : MonoBehaviour
         {
             isPhaseTwo        = true;
             phaseTwoTriggered = true;
+            Debug.Log("<color=red>[BOSS] ¡FASE 2 ACTIVADA! — EMBESTIDA DESBLOQUEADA</color>");
+        }
+
+        if (!phaseThreeTriggered && bossHealth != null && bossHealth.HealthRatio <= 0.25f)
+        {
+            isPhaseThree = true;
+            phaseThreeTriggered = true;
+            Debug.Log("<color=red>[BOSS] ¡FASE 3 ACTIVADA! — PROYECTILES BUSCADORES DESBLOQUEADOS</color>");
         }
 
         Vector3 toPlayer = player.position - transform.position;
@@ -104,7 +124,7 @@ public class BossAI : MonoBehaviour
         diff.y = 0f;
         if (diff.sqrMagnitude < 0.001f) return;
         Vector3 dir = diff.normalized;
-        transform.position += dir * moveSpeed * Time.fixedDeltaTime;
+        MoveWithCollision(dir * moveSpeed * Time.fixedDeltaTime);
         transform.rotation = Quaternion.LookRotation(dir);
     }
 
@@ -124,6 +144,9 @@ public class BossAI : MonoBehaviour
         if (isPhaseTwo)
             yield return StartCoroutine(DashAttack());
 
+        if (isPhaseThree)
+            yield return StartCoroutine(SeekingProjectileAttack());
+
         nextAttackTime = Time.time + timeBetweenAttacks;
         isAttacking    = false;
     }
@@ -142,7 +165,7 @@ public class BossAI : MonoBehaviour
 
         while (elapsed < dashDuration)
         {
-            transform.position += dashDir * dashSpeed * Time.fixedDeltaTime;
+            MoveWithCollision(dashDir * dashSpeed * Time.fixedDeltaTime);
 
             if (!damageDealt && player != null)
             {
@@ -159,6 +182,43 @@ public class BossAI : MonoBehaviour
 
             elapsed += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
+        }
+    }
+
+    private void MoveWithCollision(Vector3 delta)
+    {
+        float distance = delta.magnitude;
+        if (distance <= 0f)
+            return;
+
+        Vector3 direction = delta / distance;
+        Vector3 targetPosition = rb.position;
+
+        if (rb.SweepTest(direction, out RaycastHit hit, distance + collisionSkin, QueryTriggerInteraction.Ignore))
+        {
+            float moveToContact = Mathf.Max(0f, hit.distance - collisionSkin);
+            targetPosition += direction * moveToContact;
+
+            Vector3 remaining = delta - direction * moveToContact;
+            Vector3 slide = Vector3.ProjectOnPlane(remaining, hit.normal);
+            targetPosition += slide;
+        }
+        else
+        {
+            targetPosition += delta;
+        }
+
+        rb.MovePosition(targetPosition);
+    }
+
+    private IEnumerator SeekingProjectileAttack()
+    {
+        if (player == null) yield break;
+
+        for (int i = 0; i < seekingProjectileCount; i++)
+        {
+            SpawnSeekingBullet();
+            yield return new WaitForSeconds(0.15f);
         }
     }
 
@@ -227,5 +287,29 @@ public class BossAI : MonoBehaviour
             Physics.IgnoreCollision(bulletCollider, bossCollider);
 
         bulletRb?.AddForce(direction * bulletForce);
+    }
+
+    private void SpawnSeekingBullet()
+    {
+        if (bulletPool == null || player == null) return;
+
+        GameObject bullet = bulletPool.GetGameObjectFromPool(transform.position);
+
+        Projectile proj = bullet.GetComponent<Projectile>();
+        if (proj != null)
+        {
+            proj.SetDamage(bulletDamage);
+            proj.SetSeeking(player, seekingProjectileDuration, seekingProjectileSpeed);
+        }
+
+        Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+
+        Collider bulletCollider = bullet.GetComponent<Collider>();
+        if (bulletCollider != null && bossCollider != null)
+            Physics.IgnoreCollision(bulletCollider, bossCollider);
+
+        Vector3 initialDir = (player.position - transform.position).normalized;
+        initialDir.y = 0f;
+        bulletRb?.AddForce(initialDir * (bulletForce * 0.5f));
     }
 }

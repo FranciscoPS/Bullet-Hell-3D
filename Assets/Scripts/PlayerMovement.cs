@@ -5,6 +5,8 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private Gun gun;
+    [SerializeField] private float moveInputDeadzone = 0.1f;
+    [SerializeField] private float collisionSkin = 0.02f;
 
     private Rigidbody rb;
     private InputAction moveAction;
@@ -14,7 +16,9 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true;
         rb.freezeRotation = true;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
 
         PlayerInput playerInput = GetComponent<PlayerInput>();
         moveAction = playerInput.actions["Move"];
@@ -68,10 +72,39 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         Vector2 moveInput = moveAction.ReadValue<Vector2>();
-        Vector3 moveDirection = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
+        if (moveInput.sqrMagnitude < moveInputDeadzone * moveInputDeadzone)
+            return;
 
-        if (moveDirection != Vector3.zero)
-            transform.position += moveDirection * moveSpeed * Time.fixedDeltaTime;
+        Vector3 moveDirection = new Vector3(moveInput.x, 0f, moveInput.y);
+        if (moveDirection.sqrMagnitude > 1f)
+            moveDirection.Normalize();
+
+        MoveWithCollision(moveDirection * moveSpeed * Time.fixedDeltaTime);
+    }
+
+    private void MoveWithCollision(Vector3 delta)
+    {
+        float distance = delta.magnitude;
+        if (distance <= 0f)
+            return;
+
+        Vector3 direction = delta / distance;
+        Vector3 targetPosition = rb.position;
+
+        if (rb.SweepTest(direction, out RaycastHit hit, distance + collisionSkin, QueryTriggerInteraction.Ignore))
+        {
+            float moveToContact = Mathf.Max(0f, hit.distance - collisionSkin);
+            targetPosition += direction * moveToContact;
+
+            Vector3 remaining = delta - direction * moveToContact;
+            Vector3 slide = Vector3.ProjectOnPlane(remaining, hit.normal);
+            targetPosition += slide;
+        }
+        else
+        {
+            targetPosition += delta;
+        }
+
+        rb.MovePosition(targetPosition);
     }
 }
-
