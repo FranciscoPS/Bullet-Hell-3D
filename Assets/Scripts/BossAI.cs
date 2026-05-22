@@ -6,6 +6,7 @@ public class BossAI : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed    = 3f;
     [SerializeField] private float stopDistance = 8f;
+    [SerializeField] private float collisionSkin = 0.02f;
 
     [Header("Attack Settings")]
     [SerializeField] private float attackDuration      = 3f;
@@ -67,7 +68,11 @@ public class BossAI : MonoBehaviour
         bossHealth   = GetComponent<BossHealth>();
 
         if (rb != null)
+        {
+            rb.isKinematic = true;
             rb.freezeRotation = true;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+        }
     }
 
     private void Start() { }
@@ -119,7 +124,7 @@ public class BossAI : MonoBehaviour
         diff.y = 0f;
         if (diff.sqrMagnitude < 0.001f) return;
         Vector3 dir = diff.normalized;
-        transform.position += dir * moveSpeed * Time.fixedDeltaTime;
+        MoveWithCollision(dir * moveSpeed * Time.fixedDeltaTime);
         transform.rotation = Quaternion.LookRotation(dir);
     }
 
@@ -160,7 +165,7 @@ public class BossAI : MonoBehaviour
 
         while (elapsed < dashDuration)
         {
-            transform.position += dashDir * dashSpeed * Time.fixedDeltaTime;
+            MoveWithCollision(dashDir * dashSpeed * Time.fixedDeltaTime);
 
             if (!damageDealt && player != null)
             {
@@ -178,6 +183,32 @@ public class BossAI : MonoBehaviour
             elapsed += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
+    }
+
+    private void MoveWithCollision(Vector3 delta)
+    {
+        float distance = delta.magnitude;
+        if (distance <= 0f)
+            return;
+
+        Vector3 direction = delta / distance;
+        Vector3 targetPosition = rb.position;
+
+        if (rb.SweepTest(direction, out RaycastHit hit, distance + collisionSkin, QueryTriggerInteraction.Ignore))
+        {
+            float moveToContact = Mathf.Max(0f, hit.distance - collisionSkin);
+            targetPosition += direction * moveToContact;
+
+            Vector3 remaining = delta - direction * moveToContact;
+            Vector3 slide = Vector3.ProjectOnPlane(remaining, hit.normal);
+            targetPosition += slide;
+        }
+        else
+        {
+            targetPosition += delta;
+        }
+
+        rb.MovePosition(targetPosition);
     }
 
     private IEnumerator SeekingProjectileAttack()

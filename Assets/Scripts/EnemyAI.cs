@@ -8,6 +8,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private int projectilesPerBurst = 3;
     [SerializeField] private float timeBetweenShots = 0.3f;
     [SerializeField] private float timeBetweenBursts = 2f;
+    [SerializeField] private float collisionSkin = 0.02f;
 
     private Gun gun;
     private Transform player;
@@ -15,11 +16,15 @@ public class EnemyAI : MonoBehaviour
     private Collider enemyCollider;
     private bool isShooting = false;
     private float nextBurstTime = 0f;
+    private bool shouldChase;
+    private Vector3 chaseDirection;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true;
         rb.freezeRotation = true;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         enemyCollider = GetComponent<Collider>();
         gun = GetComponent<Gun>();
     }
@@ -47,10 +52,16 @@ public class EnemyAI : MonoBehaviour
 
         if (distance > shootRange)
         {
-            ChasePlayer();
+            shouldChase = toPlayer.sqrMagnitude > 0.001f;
+            chaseDirection = shouldChase ? toPlayer.normalized : Vector3.zero;
+            if (shouldChase)
+                transform.rotation = Quaternion.LookRotation(chaseDirection);
         }
         else
         {
+            shouldChase = false;
+            chaseDirection = Vector3.zero;
+
             if (toPlayer.sqrMagnitude > 0.001f)
                 transform.rotation = Quaternion.LookRotation(toPlayer.normalized);
 
@@ -59,14 +70,38 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    private void ChasePlayer()
+    private void FixedUpdate()
     {
-        Vector3 diff = player.position - transform.position;
-        diff.y = 0f;
-        if (diff.sqrMagnitude < 0.001f) return;
-        Vector3 direction = diff.normalized;
-        transform.position += direction * moveSpeed * Time.deltaTime;
-        transform.rotation = Quaternion.LookRotation(direction);
+        if (player == null || !shouldChase || chaseDirection.sqrMagnitude < 0.001f)
+            return;
+
+        MoveWithCollision(chaseDirection * moveSpeed * Time.fixedDeltaTime);
+    }
+
+    private void MoveWithCollision(Vector3 delta)
+    {
+        float distance = delta.magnitude;
+        if (distance <= 0f)
+            return;
+
+        Vector3 direction = delta / distance;
+        Vector3 targetPosition = rb.position;
+
+        if (rb.SweepTest(direction, out RaycastHit hit, distance + collisionSkin, QueryTriggerInteraction.Ignore))
+        {
+            float moveToContact = Mathf.Max(0f, hit.distance - collisionSkin);
+            targetPosition += direction * moveToContact;
+
+            Vector3 remaining = delta - direction * moveToContact;
+            Vector3 slide = Vector3.ProjectOnPlane(remaining, hit.normal);
+            targetPosition += slide;
+        }
+        else
+        {
+            targetPosition += delta;
+        }
+
+        rb.MovePosition(targetPosition);
     }
 
     private IEnumerator ShootBurst()
