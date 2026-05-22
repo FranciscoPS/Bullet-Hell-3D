@@ -154,6 +154,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 10
   gun: {fileID: 0}
+  moveInputDeadzone: 0.1
+  collisionSkin: 0.02
 --- !u!114 &1453811336536328507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,7 +307,7 @@ MonoBehaviour:
   target: {fileID: 474079339890456875}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1
   maxDistance: 10
   minSize: 1
   maxSize: 5.8
