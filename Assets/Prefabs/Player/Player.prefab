@@ -225,7 +225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39823074375ba47bfa4efc7ce2c4a731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  maxHealth: 100
+  maxHealth: 99999
   onDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -239,6 +239,7 @@ GameObject:
   m_Component:
   - component: {fileID: 55101653725470100}
   - component: {fileID: 9046019931601969518}
+  - component: {fileID: 8988468841107381589}
   m_Layer: 0
   m_Name: Decal Projector
   m_TagString: Untagged
@@ -289,6 +290,26 @@ MonoBehaviour:
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1
+--- !u!114 &8988468841107381589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3425626577037251278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30dbdcc9d27d81745851299b48cd601f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BlobShadowProjector
+  target: {fileID: 474079339890456875}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  maxDistance: 10
+  minSize: 1
+  maxSize: 5.8
+  offset: 0.6
 --- !u!1 &5043762940699599108
 GameObject:
   m_ObjectHideFlags: 0
@@ -804,6 +825,10 @@ PrefabInstance:
     - target: {fileID: 1053350800686879781, guid: a4e2ceb5a871bcf4aaf3c53488139169, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1630794972795428178, guid: a4e2ceb5a871bcf4aaf3c53488139169, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1630794972795428178, guid: a4e2ceb5a871bcf4aaf3c53488139169, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
