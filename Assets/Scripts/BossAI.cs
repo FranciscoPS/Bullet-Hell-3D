@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class BossAI : MonoBehaviour
 {
@@ -7,6 +8,9 @@ public class BossAI : MonoBehaviour
     [SerializeField] private float moveSpeed    = 3f;
     [SerializeField] private float stopDistance = 8f;
     [SerializeField] private float collisionSkin = 0.02f;
+    [Header("Debug")]
+    [SerializeField] private bool enableDebugLogs = true;
+    [SerializeField] private float debugLogInterval = 0.25f;
 
     [Header("Attack Settings")]
     [SerializeField] private float attackDuration      = 3f;
@@ -44,6 +48,7 @@ public class BossAI : MonoBehaviour
     [SerializeField] private float dashDuration      = 0.4f;
     [SerializeField] private float dashDamage        = 20f;
     [SerializeField] private float dashContactRadius = 1.5f;
+    [SerializeField] private float dashTracking = 0.25f;
 
     [Header("Phase 3 — Proyectil Buscador")]
     [SerializeField] private int   seekingProjectileCount = 5;
@@ -55,11 +60,15 @@ public class BossAI : MonoBehaviour
     private Collider  bossCollider;
     private bool      isAttacking    = false;
     private float     nextAttackTime = 0f;
+    private bool      shouldChase;
+    private Vector3   chaseDirection;
     private bool      isPhaseTwo        = false;
     private bool      phaseTwoTriggered = false;
     private bool      isPhaseThree       = false;
     private bool      phaseThreeTriggered = false;
     private BossHealth bossHealth;
+    private float nextDebugLogTime;
+    private bool wasChasingLastFrame;
 
     private void Awake()
     {
@@ -67,23 +76,35 @@ public class BossAI : MonoBehaviour
         bossCollider = GetComponent<Collider>();
         bossHealth   = GetComponent<BossHealth>();
 
-        if (rb != null)
-        {
-            rb.isKinematic = true;
-            rb.freezeRotation = true;
-            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-        }
+        rb.isKinematic = true;
+        rb.freezeRotation = true;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+
+        // Prevent other movement systems from fighting the Rigidbody chase.
+        Animator animator = GetComponent<Animator>();
+        if (animator != null)
+            animator.applyRootMotion = false;
+
+        NavMeshAgent navMeshAgent = GetComponent<NavMeshAgent>();
+        if (navMeshAgent != null)
+            navMeshAgent.enabled = false;
     }
 
-    private void Start() { }
-
-    private void FixedUpdate()
+    private void Start()
     {
-        if (player == null)
+        TryAssignPlayer();
+    }
+
+    private void Update()
+    {
+        if (!TryAssignPlayer())
         {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj == null) return;
-            player = playerObj.transform;
+            if (wasChasingLastFrame && enableDebugLogs)
+                Debug.Log("[BossAI] Lost player reference. Chase paused.");
+            wasChasingLastFrame = false;
+            shouldChase = false;
+            chaseDirection = Vector3.zero;
+            return;
         }
 
         if (!phaseTwoTriggered && bossHealth != null && bossHealth.HealthRatio <= 0.5f)
@@ -106,26 +127,70 @@ public class BossAI : MonoBehaviour
 
         if (distance > stopDistance)
         {
-            ChasePlayer();
+            shouldChase = toPlayer.sqrMagnitude > 0.001f;
+            chaseDirection = shouldChase ? toPlayer.normalized : Vector3.zero;
+            if (shouldChase)
+                transform.rotation = Quaternion.LookRotation(chaseDirection);
+
+            if (!wasChasingLastFrame && enableDebugLogs)
+                Debug.Log($"[BossAI] ENTER CHASE dist={distance:F2} stop={stopDistance:F2}");
+
+            if (enableDebugLogs && Time.time >= nextDebugLogTime)
+            {
+                nextDebugLogTime = Time.time + debugLogInterval;
+                Debug.Log($"[BossAI] CHASE TICK dist={distance:F2} dir={chaseDirection} pos={transform.position}");
+            }
+            wasChasingLastFrame = true;
         }
         else
         {
+            shouldChase = false;
+            chaseDirection = Vector3.zero;
             if (toPlayer.sqrMagnitude > 0.001f)
                 transform.rotation = Quaternion.LookRotation(toPlayer.normalized);
+            if (wasChasingLastFrame && enableDebugLogs)
+                Debug.Log($"[BossAI] EXIT CHASE dist={distance:F2} stop={stopDistance:F2}");
+            wasChasingLastFrame = false;
+            if (enableDebugLogs && Time.time >= nextDebugLogTime)
+            {
+                nextDebugLogTime = Time.time + debugLogInterval;
+                Debug.Log($"[BossAI] IN RANGE dist={distance:F2} stop={stopDistance:F2} (no chase, attacks disabled)");
+            }
 
-            if (!isAttacking && Time.time >= nextAttackTime)
-                StartCoroutine(ExecuteRandomAttack());
+            // TEMP: ataques desactivados para depurar solo movimiento/chase.
+            // if (!isAttacking && Time.time >= nextAttackTime)
+            //     StartCoroutine(ExecuteRandomAttack());
         }
     }
 
-    private void ChasePlayer()
+    private void FixedUpdate()
     {
-        Vector3 diff = player.position - transform.position;
-        diff.y = 0f;
-        if (diff.sqrMagnitude < 0.001f) return;
-        Vector3 dir = diff.normalized;
-        MoveWithCollision(dir * moveSpeed * Time.fixedDeltaTime);
-        transform.rotation = Quaternion.LookRotation(dir);
+        if (player == null || !shouldChase || chaseDirection.sqrMagnitude < 0.001f)
+            return;
+
+        MoveWithCollision(chaseDirection * moveSpeed * Time.fixedDeltaTime);
+    }
+
+    private bool TryAssignPlayer()
+    {
+        if (player != null)
+            return true;
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj == null)
+        {
+            if (enableDebugLogs && Time.time >= nextDebugLogTime)
+            {
+                nextDebugLogTime = Time.time + debugLogInterval;
+                Debug.LogWarning("[BossAI] Waiting for Player tag...");
+            }
+            return false;
+        }
+
+        player = playerObj.transform;
+        if (enableDebugLogs)
+            Debug.Log($"[BossAI] Player assigned: {player.name}");
+        return true;
     }
 
     private IEnumerator ExecuteRandomAttack()
@@ -165,6 +230,17 @@ public class BossAI : MonoBehaviour
 
         while (elapsed < dashDuration)
         {
+            if (player != null)
+            {
+                Vector3 desiredDir = player.position - transform.position;
+                desiredDir.y = 0f;
+                if (desiredDir.sqrMagnitude > 0.001f)
+                {
+                    desiredDir.Normalize();
+                    dashDir = Vector3.Slerp(dashDir, desiredDir, dashTracking);
+                }
+            }
+
             MoveWithCollision(dashDir * dashSpeed * Time.fixedDeltaTime);
 
             if (!damageDealt && player != null)
