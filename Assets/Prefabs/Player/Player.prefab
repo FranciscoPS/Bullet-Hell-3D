@@ -225,7 +225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39823074375ba47bfa4efc7ce2c4a731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  maxHealth: 99999
+  maxHealth: 100
   onDeath:
     m_PersistentCalls:
       m_Calls: []

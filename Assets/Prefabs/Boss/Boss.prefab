@@ -220,7 +220,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d9c35622feb54e419676f88bd553df2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossHealth
-  maxHealth: 50
+  maxHealth: 100
   onDeath:
     m_PersistentCalls:
       m_Calls: []
