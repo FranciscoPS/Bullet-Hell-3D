@@ -12,7 +12,7 @@ public class BossAI : MonoBehaviour
     [SerializeField] private bool enableDebugLogs = true;
     [SerializeField] private float debugLogInterval = 0.25f;
 
-    [Header("Attack Settings")]
+    [Header("Phase 1 Attack")]
     [SerializeField] private float attackDuration      = 3f;
     [SerializeField] private float timeBetweenAttacks  = 2f;
     [SerializeField] private float bulletForce         = 200f;
@@ -154,12 +154,15 @@ public class BossAI : MonoBehaviour
             if (enableDebugLogs && Time.time >= nextDebugLogTime)
             {
                 nextDebugLogTime = Time.time + debugLogInterval;
-                Debug.Log($"[BossAI] IN RANGE dist={distance:F2} stop={stopDistance:F2} (no chase, attacks disabled)");
+                Debug.Log($"[BossAI] IN RANGE dist={distance:F2} stop={stopDistance:F2}");
             }
 
-            // TEMP: ataques desactivados para depurar solo movimiento/chase.
-            // if (!isAttacking && Time.time >= nextAttackTime)
-            //     StartCoroutine(ExecuteRandomAttack());
+            if (!isAttacking && Time.time >= nextAttackTime)
+            {
+                if (enableDebugLogs)
+                    Debug.Log($"[BossAI] START PHASE1 ATTACK dist={distance:F2} t={Time.time:F2}");
+                StartCoroutine(ExecuteRandomAttack());
+            }
         }
     }
 
@@ -198,6 +201,8 @@ public class BossAI : MonoBehaviour
         isAttacking = true;
 
         int pattern = Random.Range(0, 3);
+        if (enableDebugLogs)
+            Debug.Log($"[BossAI] ExecutePhase1Pattern pattern={pattern}");
 
         switch (pattern)
         {
@@ -205,12 +210,6 @@ public class BossAI : MonoBehaviour
             case 1: yield return StartCoroutine(HexagonalAttack());   break;
             case 2: yield return StartCoroutine(SpiralAttack());      break;
         }
-
-        if (isPhaseTwo)
-            yield return StartCoroutine(DashAttack());
-
-        if (isPhaseThree)
-            yield return StartCoroutine(SeekingProjectileAttack());
 
         nextAttackTime = Time.time + timeBetweenAttacks;
         isAttacking    = false;
