@@ -1,3 +1,4 @@
+using System.Numerics;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
@@ -15,7 +16,9 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnEnemy()
     {
-        GameObject instance = Instantiate(enemyPrefab, transform.position, transform.rotation);
-        instance.GetComponent<EnemyAI>().SetPool(enemyBulletPool);
+        if (enemyPool == null) return;
+
+        GameObject enemy = enemyPool.GetGameObjectFromPool(transform.position);
+        enemy.GetComponent<EnemyAI>().SetPool(enemyBulletPool);
     }
 }
