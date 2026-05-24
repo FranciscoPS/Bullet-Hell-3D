@@ -75,6 +75,7 @@ public class BossAI : MonoBehaviour
     private bool pendingPhaseTwoEntryDash;
     private bool isPhaseThree;
     private bool phaseThreeTriggered;
+    private bool pendingPhaseThreeEntryDash;
 
     private Vector3 dashDirection;
     private bool dashDamageDealt;
@@ -122,10 +123,16 @@ public class BossAI : MonoBehaviour
 
         UpdatePhaseTriggers();
 
-        // Absolute priority: one guaranteed dash right when phase 2 starts.
+        // Absolute priorities: guaranteed dash on phase transitions.
+        if (state != BossState.Dashing && pendingPhaseThreeEntryDash)
+        {
+            StartPhaseEntryDash(includeSeekersAfterDash: true, isPhaseThreeEntry: true);
+            return;
+        }
+
         if (state != BossState.Dashing && pendingPhaseTwoEntryDash)
         {
-            StartPhaseTwoEntryDash();
+            StartPhaseEntryDash(includeSeekersAfterDash: false, isPhaseThreeEntry: false);
             return;
         }
 
@@ -136,8 +143,29 @@ public class BossAI : MonoBehaviour
         Vector3 toPlayer = player.position - transform.position;
         toPlayer.y = 0f;
         float distance = toPlayer.magnitude;
+        bool inRange = distance <= stopDistance;
 
-        if (distance > stopDistance)
+        // Attack scheduler (shared by in-range patterns and random phase dash),
+        // so dash can also trigger while out of range.
+        if (!isAttacking && attackCoroutine == null && Time.time >= nextAttackTime)
+        {
+            if (phaseTwoTriggered && Random.value <= phaseTwoDashChance)
+            {
+                StartRandomPhaseDash();
+                return;
+            }
+
+            if (inRange)
+            {
+                attackCoroutine = StartCoroutine(ExecuteRandomAttack());
+                return;
+            }
+
+            // Out of range and no dash this tick: wait next interval before re-rolling.
+            nextAttackTime = Time.time + timeBetweenAttacks;
+        }
+
+        if (!inRange)
         {
             if (toPlayer.sqrMagnitude > 0.001f)
             {
@@ -158,9 +186,6 @@ public class BossAI : MonoBehaviour
 
         if (toPlayer.sqrMagnitude > 0.001f)
             transform.rotation = Quaternion.LookRotation(toPlayer.normalized);
-
-        if (!isAttacking && attackCoroutine == null && Time.time >= nextAttackTime)
-            attackCoroutine = StartCoroutine(ExecuteRandomAttack());
     }
 
     private void FixedUpdate()
@@ -197,21 +222,38 @@ public class BossAI : MonoBehaviour
         {
             isPhaseThree = true;
             phaseThreeTriggered = true;
+            // Fase 3 tiene prioridad: no queremos arrastrar una embestida de entrada de fase 2.
+            pendingPhaseTwoEntryDash = false;
+            pendingPhaseThreeEntryDash = true;
             Debug.Log("<color=red>[BOSS] FASE 3 ACTIVADA - PROYECTILES BUSCADORES DESBLOQUEADOS</color>");
         }
     }
 
-    private void StartPhaseTwoEntryDash()
+    private void StartPhaseEntryDash(bool includeSeekersAfterDash, bool isPhaseThreeEntry)
     {
         if (player == null || state == BossState.Dashing)
             return;
 
         CancelCurrentAttackAndChase();
         PrepareDashDirection();
-        pendingPhaseTwoEntryDash = false;
+        if (isPhaseThreeEntry)
+            pendingPhaseThreeEntryDash = false;
+        else
+            pendingPhaseTwoEntryDash = false;
         state = BossState.Dashing;
 
-        dashCoroutine = StartCoroutine(ExecutePhaseTwoEntryDash());
+        dashCoroutine = StartCoroutine(ExecutePhaseEntryDash(includeSeekersAfterDash));
+    }
+
+    private void StartRandomPhaseDash()
+    {
+        if (player == null || state == BossState.Dashing)
+            return;
+
+        CancelCurrentAttackAndChase();
+        PrepareDashDirection();
+        state = BossState.Dashing;
+        dashCoroutine = StartCoroutine(ExecutePhaseEntryDash(isPhaseThree));
     }
 
     private void PrepareDashDirection()
@@ -238,10 +280,10 @@ public class BossAI : MonoBehaviour
         chaseDirection = Vector3.zero;
     }
 
-    private IEnumerator ExecutePhaseTwoEntryDash()
+    private IEnumerator ExecutePhaseEntryDash(bool includeSeekersAfterDash)
     {
         isAttacking = true;
-        yield return StartCoroutine(ExecuteDashSequence(isPhaseThree));
+        yield return StartCoroutine(ExecuteDashSequence(includeSeekersAfterDash));
         isAttacking = false;
         dashCoroutine = null;
         nextAttackTime = Time.time + timeBetweenAttacks;
@@ -373,14 +415,6 @@ public class BossAI : MonoBehaviour
             case 0: yield return StartCoroutine(CircularAttack());  break;
             case 1: yield return StartCoroutine(HexagonalAttack()); break;
             case 2: yield return StartCoroutine(SpiralAttack());    break;
-        }
-
-        if (phaseTwoTriggered && Random.value <= phaseTwoDashChance)
-        {
-            state = BossState.Dashing;
-            PrepareDashDirection();
-            yield return StartCoroutine(ExecuteDashSequence(isPhaseThree));
-            state = BossState.InRange;
         }
 
         nextAttackTime = Time.time + timeBetweenAttacks;
