@@ -1,8 +1,10 @@
+using System.Numerics;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private GameObjectPool enemyPool;
     [SerializeField] private GameObjectPool enemyBulletPool;
     [SerializeField] private float spawnInterval = 3f;
 
@@ -14,7 +16,9 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnEnemy()
     {
-        GameObject instance = Instantiate(enemyPrefab, transform.position, transform.rotation);
-        instance.GetComponent<EnemyAI>().SetPool(enemyBulletPool);
+        if (enemyPool == null) return;
+
+        GameObject enemy = enemyPool.GetGameObjectFromPool(transform.position);
+        enemy.GetComponent<EnemyAI>().SetPool(enemyBulletPool);
     }
 }
