@@ -53,6 +53,8 @@ public class BossAI : MonoBehaviour
     [SerializeField] private float dashDamage = 20f;
     [SerializeField] private float dashContactRadius = 1.5f;
     [SerializeField] private string wallTag = "Wall";
+    [Range(0f, 1f)]
+    [SerializeField] private float phaseTwoDashChance = 0.35f;
 
     [Header("Phase 3 - Seeking Projectile")]
     [SerializeField] private int seekingProjectileCount = 5;
@@ -239,21 +241,7 @@ public class BossAI : MonoBehaviour
     private IEnumerator ExecutePhaseTwoEntryDash()
     {
         isAttacking = true;
-        dashDamageDealt = false;
-        SetPlayerCollisionIgnored(true);
-
-        while (true)
-        {
-            bool hitWall = MoveDashStepUntilWall(dashDirection, dashSpeed * Time.fixedDeltaTime);
-            TryDealDashDamage();
-
-            if (hitWall)
-                break;
-
-            yield return new WaitForFixedUpdate();
-        }
-
-        SetPlayerCollisionIgnored(false);
+        yield return StartCoroutine(ExecuteDashSequence(isPhaseThree));
         isAttacking = false;
         dashCoroutine = null;
         nextAttackTime = Time.time + timeBetweenAttacks;
@@ -277,6 +265,28 @@ public class BossAI : MonoBehaviour
             ph?.TakeDamage(dashDamage);
             dashDamageDealt = true;
         }
+    }
+
+    private IEnumerator ExecuteDashSequence(bool includeSeekersAfterDash)
+    {
+        dashDamageDealt = false;
+        SetPlayerCollisionIgnored(true);
+
+        while (true)
+        {
+            bool hitWall = MoveDashStepUntilWall(dashDirection, dashSpeed * Time.fixedDeltaTime);
+            TryDealDashDamage();
+
+            if (hitWall)
+                break;
+
+            yield return new WaitForFixedUpdate();
+        }
+
+        SetPlayerCollisionIgnored(false);
+
+        if (includeSeekersAfterDash)
+            yield return StartCoroutine(SeekingProjectileAttack());
     }
 
     // Returns true only when the step collides with an object tagged as wall.
@@ -363,6 +373,14 @@ public class BossAI : MonoBehaviour
             case 0: yield return StartCoroutine(CircularAttack());  break;
             case 1: yield return StartCoroutine(HexagonalAttack()); break;
             case 2: yield return StartCoroutine(SpiralAttack());    break;
+        }
+
+        if (phaseTwoTriggered && Random.value <= phaseTwoDashChance)
+        {
+            state = BossState.Dashing;
+            PrepareDashDirection();
+            yield return StartCoroutine(ExecuteDashSequence(isPhaseThree));
+            state = BossState.InRange;
         }
 
         nextAttackTime = Time.time + timeBetweenAttacks;
