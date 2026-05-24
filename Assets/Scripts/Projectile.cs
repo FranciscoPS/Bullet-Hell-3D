@@ -11,6 +11,9 @@ public class Projectile : MonoBehaviour
     private Transform seekingTarget;
     private float seekingDuration;
     private float seekingSpeed;
+    private float seekingTurnRateDeg;
+    private float seekingStartDelay;
+    private float seekingAimOffsetDeg;
     private float seekingElapsed;
     private bool isSeeking;
 
@@ -19,11 +22,20 @@ public class Projectile : MonoBehaviour
         damage = amount;
     }
 
-    public void SetSeeking(Transform target, float duration, float speed)
+    public void SetSeeking(
+        Transform target,
+        float duration,
+        float speed,
+        float turnRateDeg = 120f,
+        float startDelay = 0.2f,
+        float inaccuracyDeg = 7f)
     {
         seekingTarget = target;
-        seekingDuration = duration;
-        seekingSpeed = speed;
+        seekingDuration = Mathf.Max(0f, duration);
+        seekingSpeed = Mathf.Max(0f, speed);
+        seekingTurnRateDeg = Mathf.Max(0f, turnRateDeg);
+        seekingStartDelay = Mathf.Max(0f, startDelay);
+        seekingAimOffsetDeg = Random.Range(-Mathf.Abs(inaccuracyDeg), Mathf.Abs(inaccuracyDeg));
         seekingElapsed = 0f;
         isSeeking = true;
     }
@@ -33,6 +45,11 @@ public class Projectile : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         isSeeking = false;
         seekingTarget = null;
+        seekingDuration = 0f;
+        seekingSpeed = 0f;
+        seekingTurnRateDeg = 0f;
+        seekingStartDelay = 0f;
+        seekingAimOffsetDeg = 0f;
 
         if (lifetimeRoutine != null)
             StopCoroutine(lifetimeRoutine);
@@ -51,11 +68,23 @@ public class Projectile : MonoBehaviour
                 return;
             }
 
+            // Telegraph: a short straight flight gives the player time to react.
+            if (seekingElapsed < seekingStartDelay)
+                return;
+
             Vector3 dir = (seekingTarget.position - transform.position);
             if (dir.sqrMagnitude > 0.001f)
             {
                 dir.Normalize();
-                rb.linearVelocity = dir * seekingSpeed;
+                dir = Quaternion.AngleAxis(seekingAimOffsetDeg, Vector3.up) * dir;
+
+                Vector3 currentDir = rb.linearVelocity.sqrMagnitude > 0.001f
+                    ? rb.linearVelocity.normalized
+                    : transform.forward;
+
+                float turnStepRad = seekingTurnRateDeg * Mathf.Deg2Rad * Time.fixedDeltaTime;
+                Vector3 nextDir = Vector3.RotateTowards(currentDir, dir, turnStepRad, 0f);
+                rb.linearVelocity = nextDir * seekingSpeed;
             }
         }
     }

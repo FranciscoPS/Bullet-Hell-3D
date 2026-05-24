@@ -58,8 +58,12 @@ public class BossAI : MonoBehaviour
 
     [Header("Phase 3 - Seeking Projectile")]
     [SerializeField] private int seekingProjectileCount = 5;
-    [SerializeField] private float seekingProjectileDuration = 3f;
-    [SerializeField] private float seekingProjectileSpeed = 15f;
+    [SerializeField] private float seekingProjectileDuration = 2.2f;
+    [SerializeField] private float seekingProjectileSpeed = 13f;
+    [SerializeField] private float seekingTurnRate = 120f;
+    [SerializeField] private float seekingStartDelay = 0.2f;
+    [Range(0f, 20f)]
+    [SerializeField] private float seekingInaccuracy = 7f;
 
     private Transform player;
     private Rigidbody rb;
@@ -536,7 +540,13 @@ public class BossAI : MonoBehaviour
         if (proj != null)
         {
             proj.SetDamage(bulletDamage);
-            proj.SetSeeking(player, seekingProjectileDuration, seekingProjectileSpeed);
+            proj.SetSeeking(
+                player,
+                seekingProjectileDuration,
+                seekingProjectileSpeed,
+                seekingTurnRate,
+                seekingStartDelay,
+                seekingInaccuracy);
         }
 
         Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
