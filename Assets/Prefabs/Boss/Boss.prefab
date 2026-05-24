@@ -191,6 +191,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossAI
   moveSpeed: 3
   stopDistance: 8
+  collisionSkin: 0.02
   attackDuration: 3
   timeBetweenAttacks: 2
   bulletForce: 200
@@ -205,9 +206,15 @@ MonoBehaviour:
   spiralFireRate: 0.08
   bulletPool: {fileID: 0}
   dashSpeed: 20
-  dashDuration: 1
   dashDamage: 30
   dashContactRadius: 1.5
+  wallTag: Wall
+  phaseTwoDashChance: 0.5
+  enableDashLogs: 1
+  autoNormalizeDashSettings: 1
+  seekingProjectileCount: 5
+  seekingProjectileDuration: 3
+  seekingProjectileSpeed: 15
 --- !u!114 &1153793795262775527
 MonoBehaviour:
   m_ObjectHideFlags: 0
