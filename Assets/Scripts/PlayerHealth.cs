@@ -9,13 +9,14 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Death")]
     [SerializeField] private Animator animator;
-    [SerializeField] private float deathAnimationDuration = 2f;
+    [SerializeField] private float deathAnimationDuration = 4f;
     [SerializeField] private GameObject visualRoot;
 
     public UnityEvent onDeath;
 
     private float currentHealth;
     private bool isDead;
+    private Animator[] animators;
 
     private PlayerMovement playerMovement;
 
@@ -23,10 +24,33 @@ public class PlayerHealth : MonoBehaviour
     {
         currentHealth = maxHealth;
 
+        animators = GetComponentsInChildren<Animator>(true);
+
+        Debug.Log("Animators encontrados: " + animators.Length);
+
+        foreach (Animator a in animators)
+        {
+            Debug.Log(a.name);
+        }
+
+        playerMovement = GetComponent<PlayerMovement>();
+
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
 
-        playerMovement = GetComponent<PlayerMovement>();
+        if (animator == null)
+        {
+            Debug.LogWarning("[PlayerHealth] No se encontró Animator. Asigna uno en el Inspector para reproducir la animación de muerte.");
+        }
+        else
+        {
+            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+
+            if (!AnimatorHasParameter(animator, "isDead"))
+            {
+                Debug.LogWarning("[PlayerHealth] El Animator no contiene el parámetro 'isDead'. Crea un parámetro bool llamado 'isDead' o actualiza el código.");
+            }
+        }
     }
 
     public void TakeDamage(float amount)
@@ -47,20 +71,22 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
+        Debug.Log("DIE LLAMADO");
+
         if (isDead)
             return;
 
         isDead = true;
 
-        Debug.Log("Jugador muerto");
+        Animator[] animators = GetComponentsInChildren<Animator>(true);
 
-        onDeath?.Invoke();
+        foreach (Animator anim in animators)
+        {
+            anim.SetTrigger("Death");
+        }
 
         if (playerMovement != null)
             playerMovement.enabled = false;
-
-        if (animator != null)
-            animator.SetBool("isDead", true);
 
         StartCoroutine(DeathRoutine());
     }
@@ -88,5 +114,15 @@ public class PlayerHealth : MonoBehaviour
     public bool IsDead()
     {
         return isDead;
+    }
+
+    private bool AnimatorHasParameter(Animator anim, string paramName)
+    {
+        foreach (AnimatorControllerParameter p in anim.parameters)
+        {
+            if (p.name == paramName)
+                return true;
+        }
+        return false;
     }
 }
