@@ -228,6 +228,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maxHealth: 100
+  animator: {fileID: 4995156857155442558}
+  deathBoolName: isDead
+  deathAnimationDuration: 3
+  visual: {fileID: 6115713233825730139}
   onDeath:
     m_PersistentCalls:
       m_Calls: []
