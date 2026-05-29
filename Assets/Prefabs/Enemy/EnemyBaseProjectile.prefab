@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c79c24e4e9f44c959072cfe359de280, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
-  lifetime: 3
+  lifetime: 6
   rb: {fileID: 3517017552871574923}
 --- !u!54 &3517017552871574923
 Rigidbody:
