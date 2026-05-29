@@ -114,6 +114,7 @@ public class BossAI : MonoBehaviour
     private void OnDisable()
     {
         SetPlayerCollisionIgnored(false);
+        SetBossInvulnerable(false);
     }
 
     private void Update()
@@ -317,6 +318,7 @@ public class BossAI : MonoBehaviour
     {
         dashDamageDealt = false;
         SetPlayerCollisionIgnored(true);
+        SetBossInvulnerable(true);
 
         while (true)
         {
@@ -329,6 +331,7 @@ public class BossAI : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
 
+        SetBossInvulnerable(false);
         SetPlayerCollisionIgnored(false);
 
         if (includeSeekersAfterDash)
@@ -406,6 +409,11 @@ public class BossAI : MonoBehaviour
                 continue;
             Physics.IgnoreCollision(bossCollider, c, ignored);
         }
+    }
+
+    private void SetBossInvulnerable(bool isInvulnerable)
+    {
+        bossHealth?.SetInvulnerable(isInvulnerable);
     }
 
     private IEnumerator ExecuteRandomAttack()
