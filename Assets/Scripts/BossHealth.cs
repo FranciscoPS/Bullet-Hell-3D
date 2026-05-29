@@ -7,6 +7,7 @@ public class BossHealth : MonoBehaviour
     [SerializeField] private DamageFlash damageFlash;
 
     public UnityEvent onDeath;
+    public bool IsInvulnerable { get; private set; }
 
     private float currentHealth;
 
@@ -20,6 +21,9 @@ public class BossHealth : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+        if (IsInvulnerable)
+            return;
+
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0f);
         damageFlash?.Play();
@@ -27,6 +31,11 @@ public class BossHealth : MonoBehaviour
 
         if (currentHealth <= 0f)
             Die();
+    }
+
+    public void SetInvulnerable(bool isInvulnerable)
+    {
+        IsInvulnerable = isInvulnerable;
     }
 
     private void ResolveDamageFlash()
