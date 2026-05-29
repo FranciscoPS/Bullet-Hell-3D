@@ -19,7 +19,6 @@ public class PlayerMovement : MonoBehaviour
     private InputAction moveAction;
     private InputAction shootAction;
     private InputAction dashAction;
-    private bool ownsDashAction;
     private Vector3 aimDirection = Vector3.forward;
     private Vector3 dashDirection;
     private bool isDashing;
@@ -52,12 +51,6 @@ public class PlayerMovement : MonoBehaviour
         EndDash();
         shootAction.Disable();
         dashAction.Disable();
-    }
-
-    private void OnDestroy()
-    {
-        if (ownsDashAction)
-            dashAction.Dispose();
     }
 
     public void SetGun(Gun assignedGun)
