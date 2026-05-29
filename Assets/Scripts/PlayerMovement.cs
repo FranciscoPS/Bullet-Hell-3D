@@ -46,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
     {
         AimAtMouse();
 
-        if (shootAction.IsPressed())
+        if (shootAction.IsInProgress())
             gun?.Shoot(aimDirection);
     }
 
