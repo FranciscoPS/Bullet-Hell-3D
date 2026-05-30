@@ -3,6 +3,10 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private const int MaxCollisionIterations = 3;
+    private const float MinMoveSqrMagnitude = 0.000001f;
+    private const float MaxBlockingNormalY = 0.5f;
+
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private Gun gun;
@@ -15,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float dashCooldown = 0.75f;
 
     private Rigidbody rb;
+    private Collider playerCollider;
     private PlayerHealth playerHealth;
     private InputAction moveAction;
     private InputAction shootAction;
@@ -28,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        playerCollider = GetComponent<Collider>();
         playerHealth = GetComponent<PlayerHealth>();
 
         rb.isKinematic = true;
@@ -163,27 +169,80 @@ public class PlayerMovement : MonoBehaviour
 
     private void MoveWithCollision(Vector3 delta)
     {
-        float distance = delta.magnitude;
-        if (distance <= 0f)
+        if (delta.sqrMagnitude <= MinMoveSqrMagnitude)
             return;
 
-        Vector3 direction = delta / distance;
         Vector3 targetPosition = rb.position;
+        Vector3 remaining = delta;
 
-        if (rb.SweepTest(direction, out RaycastHit hit, distance + collisionSkin, QueryTriggerInteraction.Ignore))
+        for (int i = 0; i < MaxCollisionIterations; i++)
         {
-            float moveToContact = Mathf.Max(0f, hit.distance - collisionSkin);
-            targetPosition += direction * moveToContact;
+            float distance = remaining.magnitude;
+            if (distance <= 0f)
+                break;
 
-            Vector3 remaining = delta - direction * moveToContact;
-            Vector3 slide = Vector3.ProjectOnPlane(remaining, hit.normal);
-            targetPosition += slide;
-        }
-        else
-        {
-            targetPosition += delta;
+            Vector3 direction = remaining / distance;
+            if (!TrySweepMovement(direction, distance + collisionSkin, out RaycastHit hit))
+            {
+                targetPosition += remaining;
+                break;
+            }
+
+            float moveDistance = Mathf.Min(distance, Mathf.Max(0f, hit.distance - collisionSkin));
+            targetPosition += direction * moveDistance;
+
+            float remainingDistance = distance - moveDistance;
+            if (remainingDistance <= collisionSkin)
+                break;
+
+            Vector3 slide = Vector3.ProjectOnPlane(direction * remainingDistance, hit.normal);
+            slide.y = 0f;
+
+            if (slide.sqrMagnitude <= MinMoveSqrMagnitude)
+                break;
+
+            remaining = slide;
         }
 
         rb.MovePosition(targetPosition);
+    }
+
+    private bool TrySweepMovement(Vector3 direction, float distance, out RaycastHit closestHit)
+    {
+        RaycastHit[] hits = rb.SweepTestAll(direction, distance, QueryTriggerInteraction.Ignore);
+        closestHit = default;
+        bool foundHit = false;
+        float closestDistance = float.MaxValue;
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            RaycastHit hit = hits[i];
+            if (!IsBlockingHit(hit) || hit.distance >= closestDistance)
+                continue;
+
+            closestDistance = hit.distance;
+            closestHit = hit;
+            foundHit = true;
+        }
+
+        return foundHit;
+    }
+
+    private bool IsBlockingHit(RaycastHit hit)
+    {
+        Collider hitCollider = hit.collider;
+        if (hitCollider == null || hitCollider == playerCollider || hitCollider.isTrigger)
+            return false;
+
+        if (hitCollider.attachedRigidbody == rb)
+            return false;
+
+        if (hitCollider.attachedRigidbody != null)
+            return false;
+
+        if (Mathf.Abs(hit.normal.y) > MaxBlockingNormalY)
+            return false;
+
+        return !Physics.GetIgnoreLayerCollision(gameObject.layer, hitCollider.gameObject.layer);
     }
 }
