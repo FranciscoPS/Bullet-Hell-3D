@@ -6,6 +6,7 @@ public class PlayerHealth : MonoBehaviour
 {
     [Header("Health")]
     [SerializeField] private float maxHealth = 100f;
+    [SerializeField] private DamageFlash damageFlash;
 
     [Header("Death")]
     [SerializeField] private Animator animator;
@@ -13,6 +14,7 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private GameObject visualRoot;
 
     public UnityEvent onDeath;
+    public bool IsInvulnerable { get; private set; }
 
     private float currentHealth;
     private bool isDead;
@@ -40,7 +42,7 @@ public class PlayerHealth : MonoBehaviour
 
         if (animator == null)
         {
-            Debug.LogWarning("[PlayerHealth] No se encontró Animator. Asigna uno en el Inspector para reproducir la animación de muerte.");
+            Debug.LogWarning("[PlayerHealth] No se encontrï¿½ Animator. Asigna uno en el Inspector para reproducir la animaciï¿½n de muerte.");
         }
         else
         {
@@ -48,9 +50,10 @@ public class PlayerHealth : MonoBehaviour
 
             if (!AnimatorHasParameter(animator, "isDead"))
             {
-                Debug.LogWarning("[PlayerHealth] El Animator no contiene el parámetro 'isDead'. Crea un parámetro bool llamado 'isDead' o actualiza el código.");
+                Debug.LogWarning("[PlayerHealth] El Animator no contiene el parï¿½metro 'isDead'. Crea un parï¿½metro bool llamado 'isDead' o actualiza el cï¿½digo.");
             }
         }
+        ResolveDamageFlash();
     }
 
     public void TakeDamage(float amount)
@@ -62,11 +65,32 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
 
         Debug.Log($"Vida: {currentHealth}/{maxHealth}");
+        if (IsInvulnerable)
+            return;
+
+        currentHealth -= amount;
+        currentHealth = Mathf.Max(currentHealth, 0f);
+        damageFlash?.Play();
+        Debug.Log($"[PlayerHealth] Vida: {currentHealth} / {maxHealth}");
 
         if (currentHealth <= 0f)
         {
             Die();
         }
+    }
+
+    public void SetInvulnerable(bool isInvulnerable)
+    {
+        IsInvulnerable = isInvulnerable;
+    }
+
+    private void ResolveDamageFlash()
+    {
+        if (damageFlash != null)
+            return;
+
+        if (!TryGetComponent(out damageFlash))
+            damageFlash = gameObject.AddComponent<DamageFlash>();
     }
 
     private void Die()

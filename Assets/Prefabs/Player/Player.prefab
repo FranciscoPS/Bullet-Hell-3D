@@ -136,6 +136,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 43dc27a9-e243-4568-8e7b-ec31456b38cc
     m_ActionName: 'Player/Shoot[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 1dc30b13-3949-4aaf-ab78-20260496c8a1
+    m_ActionName: 'Player/Dash[/Keyboard/space]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -157,6 +161,9 @@ MonoBehaviour:
   gun: {fileID: 0}
   moveInputDeadzone: 0.1
   collisionSkin: 0.02
+  dashSpeed: 28
+  dashDuration: 0.18
+  dashCooldown: 0.75
 --- !u!114 &1453811336536328507
 MonoBehaviour:
   m_ObjectHideFlags: 0
