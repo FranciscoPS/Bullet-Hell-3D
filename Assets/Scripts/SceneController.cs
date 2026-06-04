@@ -24,9 +24,20 @@ public class SceneController : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        screenDarkener.alpha = 1f;
+        screenDarkener.DOFade(0f, 0.5f);
+    }
+
     public void StartGameScene()
     {
         StartCoroutine(FadeOutGameScene());
+    }
+
+    public void BackToMainMenu()
+    {
+        SceneManager.LoadScene("Main_Menu");
     }
 
     public void QuitGame()
