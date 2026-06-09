@@ -20,14 +20,15 @@ public class SceneController : MonoBehaviour
         }
         else
         {
-            Destroy(this);
+            Destroy(gameObject);
+            return;
         }
     }
 
     void Start()
     {
-        screenDarkener.alpha = 1f;
-        screenDarkener.DOFade(0f, 0.5f);
+        if (screenDarkener != null)
+            screenDarkener.DOFade(0f, 0.5f);
     }
 
     public void StartGameScene()
@@ -47,7 +48,9 @@ public class SceneController : MonoBehaviour
 
     IEnumerator FadeOutGameScene()
     {
-        screenDarkener.DOFade(1f, 1.5f);
+        if (screenDarkener != null)
+            screenDarkener.DOFade(1f, 1.5f);
+
         yield return new WaitForSeconds(1.5f);
         SceneManager.LoadScene("MovementTest");
     }
