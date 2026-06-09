@@ -102,6 +102,8 @@ public class PlayerHealth : MonoBehaviour
 
         isDead = true;
 
+        FindAnyObjectByType<EndGameUIController>()?.ShowPlayerDefeat();
+
         Animator[] animators = GetComponentsInChildren<Animator>(true);
 
         foreach (Animator anim in animators)
@@ -129,6 +131,9 @@ public class PlayerHealth : MonoBehaviour
             collider.enabled = false;
         }
     }
+
+    public float CurrentHealth => currentHealth;
+    public float MaxHealth => maxHealth;
 
     public float GetHealth()
     {

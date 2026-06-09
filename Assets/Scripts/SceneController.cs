@@ -36,9 +36,14 @@ public class SceneController : MonoBehaviour
         StartCoroutine(FadeOutGameScene());
     }
 
+    public void LoadSceneWithFade(string sceneName)
+    {
+        StartCoroutine(FadeOutToScene(sceneName));
+    }
+
     public void BackToMainMenu()
     {
-        SceneManager.LoadScene("Main_Menu");
+        LoadSceneWithFade("Main_Menu");
     }
 
     public void QuitGame()
@@ -48,10 +53,19 @@ public class SceneController : MonoBehaviour
 
     IEnumerator FadeOutGameScene()
     {
-        if (screenDarkener != null)
-            screenDarkener.DOFade(1f, 1.5f);
+        yield return FadeOutToScene("MovementTest");
+    }
 
-        yield return new WaitForSeconds(1.5f);
-        SceneManager.LoadScene("MovementTest");
+    IEnumerator FadeOutToScene(string sceneName)
+    {
+        Time.timeScale = 0f;
+
+        if (screenDarkener != null)
+            screenDarkener.DOFade(1f, 1.5f).SetUpdate(true);
+
+        yield return new WaitForSecondsRealtime(1.5f);
+
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(sceneName);
     }
 }
