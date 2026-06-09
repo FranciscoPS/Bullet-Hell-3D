@@ -24,8 +24,10 @@ public class PlayerMovement : MonoBehaviour
     private InputAction moveAction;
     private InputAction shootAction;
     private InputAction dashAction;
+    private InputAction pauseAction;
     private Vector3 aimDirection = Vector3.forward;
     private Vector3 dashDirection;
+    private bool isPaused;
     private bool isDashing;
     private float dashTimeRemaining;
     private float nextDashReadyTime;
@@ -44,12 +46,14 @@ public class PlayerMovement : MonoBehaviour
         moveAction = playerInput.actions["Move"];
         shootAction = playerInput.actions["Shoot"];
         dashAction = playerInput.actions["Dash"];
+        pauseAction = playerInput.actions["Pause"];
     }
 
     private void OnEnable()
     {
         shootAction.Enable();
         dashAction.Enable();
+        pauseAction.Enable();
     }
 
     private void OnDisable()
@@ -57,6 +61,7 @@ public class PlayerMovement : MonoBehaviour
         EndDash();
         shootAction.Disable();
         dashAction.Disable();
+        pauseAction.Disable();
     }
 
     public void SetGun(Gun assignedGun)
@@ -68,6 +73,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        /*if (pauseAction.WasPressedThisFrame())
+        {
+            TogglePause();
+            return;
+        }*/
+
+        if (isPaused)
+            return;
+
         AimAtMouse();
 
         if (dashAction.WasPressedThisFrame())
@@ -76,6 +90,12 @@ public class PlayerMovement : MonoBehaviour
         if (shootAction.IsInProgress())
             gun?.Shoot(aimDirection);
     }
+
+    /*public void TogglePause()
+    {
+        isPaused = !isPaused;
+        Time.timeScale = isPaused ? 0f : 1f;
+    }*/
 
     private void AimAtMouse()
     {
