@@ -76,6 +76,14 @@ public class PlayerHealth : MonoBehaviour
             Die();
         }
     }
+    public void Heal(float amount)
+    {
+        if (isDead)
+            return;
+
+        currentHealth += amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+    }
 
     public void SetInvulnerable(bool isInvulnerable)
     {

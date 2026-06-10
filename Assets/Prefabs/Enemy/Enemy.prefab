@@ -131,6 +131,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   maxHealth: 1
   damageFlash: {fileID: 0}
+  dropPrefab: {fileID: 8303163614225727116, guid: 82f0f943f81481240b7167f3f9645f2c, type: 3}
+  dropChance: 30
 --- !u!114 &3409203720244767959
 MonoBehaviour:
   m_ObjectHideFlags: 0
