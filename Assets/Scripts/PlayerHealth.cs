@@ -61,16 +61,14 @@ public class PlayerHealth : MonoBehaviour
         if (isDead)
             return;
 
-        currentHealth -= amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
-
-        Debug.Log($"Vida: {currentHealth}/{maxHealth}");
         if (IsInvulnerable)
             return;
 
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0f);
+
         damageFlash?.Play();
+
         Debug.Log($"[PlayerHealth] Vida: {currentHealth} / {maxHealth}");
 
         if (currentHealth <= 0f)

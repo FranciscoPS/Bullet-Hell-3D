@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,6 +19,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float dashDuration = 0.18f;
     [SerializeField] private float dashCooldown = 0.75f;
 
+    private Animator[] animators;
+
     private Rigidbody rb;
     private Collider playerCollider;
     private PlayerHealth playerHealth;
@@ -29,6 +32,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 dashDirection;
     private bool isPaused;
     private bool isDashing;
+    private bool isMoving;
     private float dashTimeRemaining;
     private float nextDashReadyTime;
 
@@ -37,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         playerCollider = GetComponent<Collider>();
         playerHealth = GetComponent<PlayerHealth>();
+        animators = GetComponentsInChildren<Animator>(true);
 
         rb.isKinematic = true;
         rb.freezeRotation = true;
@@ -125,10 +130,26 @@ public class PlayerMovement : MonoBehaviour
         }
 
         Vector2 moveInput = moveAction.ReadValue<Vector2>();
-        if (moveInput.sqrMagnitude < moveInputDeadzone * moveInputDeadzone)
+
+        bool currentlyMoving =
+            moveInput.sqrMagnitude >= moveInputDeadzone * moveInputDeadzone;
+
+        if (currentlyMoving != isMoving)
+        {
+            isMoving = currentlyMoving;
+
+            foreach (Animator anim in animators)
+            {
+                if (anim != null)
+                    anim.SetBool("isMoving", isMoving);
+            }
+        }
+
+        if (!currentlyMoving)
             return;
 
         Vector3 moveDirection = new Vector3(moveInput.x, 0f, moveInput.y);
+
         if (moveDirection.sqrMagnitude > 1f)
             moveDirection.Normalize();
 
@@ -153,6 +174,12 @@ public class PlayerMovement : MonoBehaviour
         dashTimeRemaining = duration;
         isDashing = true;
         playerHealth?.SetInvulnerable(true);
+
+        foreach (Animator anim in animators)
+        {
+            if (anim != null)
+                anim.SetTrigger("Dash");
+        }
     }
 
     private Vector3 GetDashDirection()
