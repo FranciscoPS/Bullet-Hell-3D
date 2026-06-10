@@ -174,6 +174,12 @@ public class PlayerMovement : MonoBehaviour
         dashTimeRemaining = duration;
         isDashing = true;
         playerHealth?.SetInvulnerable(true);
+
+        foreach (Animator anim in animators)
+        {
+            if (anim != null)
+                anim.SetTrigger("Dash");
+        }
     }
 
     private Vector3 GetDashDirection()
