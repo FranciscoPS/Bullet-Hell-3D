@@ -50,6 +50,7 @@ public class BossHealth : MonoBehaviour
     private void Die()
     {
         Debug.Log("[BossHealth] El boss ha muerto.");
+        FindAnyObjectByType<EndGameUIController>()?.ShowBossVictory();
         onDeath?.Invoke();
         Destroy(gameObject);
     }
