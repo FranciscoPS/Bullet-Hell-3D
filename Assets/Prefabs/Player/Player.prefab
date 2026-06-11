@@ -141,6 +141,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 1dc30b13-3949-4aaf-ab78-20260496c8a1
     m_ActionName: 'Player/Dash[/Keyboard/space]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: d1b88a35-8514-4ac9-b0e2-a8a91eba3b68
+    m_ActionName: 'Player/Pause[/Keyboard/escape]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -241,6 +245,7 @@ MonoBehaviour:
   animator: {fileID: 964052103898777171}
   deathAnimationDuration: 3.5
   visualRoot: {fileID: 6115713233825730139}
+  damageSound: {fileID: 8300000, guid: 80c68cf8cf807144c9b92d6e505bf906, type: 3}
   onDeath:
     m_PersistentCalls:
       m_Calls: []
