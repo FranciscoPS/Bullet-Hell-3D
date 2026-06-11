@@ -186,6 +186,7 @@ MonoBehaviour:
   damage: 10
   fireRate: 3
   muzzle: {fileID: 6170701856605060176}
+  shootSound: {fileID: 8300000, guid: c639bf7f79e150647bcfef6443c479da, type: 3}
 --- !u!205 &5412983485642157013
 LODGroup:
   m_ObjectHideFlags: 0
@@ -284,7 +285,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
