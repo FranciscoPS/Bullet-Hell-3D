@@ -7,6 +7,9 @@ public class Gun : MonoBehaviour
     [SerializeField] private float damage = 10f;
     [SerializeField] private float fireRate = 8f;
     [SerializeField] private Transform muzzle;
+    [SerializeField] private AudioClip shootSound;
+
+    private AudioSource audioSource;
 
     private Collider ownerCollider;
     private float lastShootTime = -Mathf.Infinity;
@@ -14,6 +17,7 @@ public class Gun : MonoBehaviour
     private void Awake()
     {
         ownerCollider = GetComponentInParent<Collider>();
+        audioSource = GetComponentInParent<AudioSource>();
     }
 
     public void SetPool(GameObjectPool bulletPool)
@@ -26,6 +30,11 @@ public class Gun : MonoBehaviour
         if (pool == null) return;
         if (fireRate > 0 && Time.time - lastShootTime < 1f / fireRate) return;
         lastShootTime = Time.time;
+
+        if (audioSource != null && shootSound != null)
+        {
+            audioSource.PlayOneShot(shootSound);
+        }
 
         Transform spawnPoint = muzzle != null ? muzzle : transform;
         GameObject projectile = pool.GetGameObjectFromPool(spawnPoint.position);

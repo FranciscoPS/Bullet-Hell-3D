@@ -10,6 +10,7 @@ public class BossHealth : MonoBehaviour
     public bool IsInvulnerable { get; private set; }
 
     private float currentHealth;
+    private AudioSource audioSource;
 
     public float HealthRatio => maxHealth > 0f ? currentHealth / maxHealth : 0f;
 
@@ -17,6 +18,8 @@ public class BossHealth : MonoBehaviour
     {
         currentHealth = maxHealth;
         ResolveDamageFlash();
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void TakeDamage(float amount)
@@ -26,7 +29,14 @@ public class BossHealth : MonoBehaviour
 
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0f);
+
         damageFlash?.Play();
+
+        if (audioSource != null)
+        {
+            audioSource.PlayOneShot(audioSource.clip);
+        }
+
         Debug.Log($"[BossHealth] Vida: {currentHealth} / {maxHealth}");
 
         if (currentHealth <= 0f)

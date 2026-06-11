@@ -13,6 +13,11 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private float deathAnimationDuration = 4f;
     [SerializeField] private GameObject visualRoot;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip damageSound;
+
+    private AudioSource audioSource;
+
     public UnityEvent onDeath;
     public bool IsInvulnerable { get; private set; }
 
@@ -54,6 +59,8 @@ public class PlayerHealth : MonoBehaviour
             }
         }
         ResolveDamageFlash();
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void TakeDamage(float amount)
@@ -68,6 +75,11 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = Mathf.Max(currentHealth, 0f);
 
         damageFlash?.Play();
+
+        if (audioSource != null && damageSound != null)
+        {
+            audioSource.PlayOneShot(damageSound);
+        }
 
         Debug.Log($"[PlayerHealth] Vida: {currentHealth} / {maxHealth}");
 
