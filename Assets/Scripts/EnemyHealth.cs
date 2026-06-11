@@ -6,6 +6,10 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] private float maxHealth = 30f;
     [SerializeField] private DamageFlash damageFlash;
 
+    [Header("Drops")]
+    [SerializeField] private GameObject dropPrefab;
+    [SerializeField][Range(0f, 100f)] private float dropChance = 30f;
+
     private float currentHealth;
     private bool isDead;
     private EnemyAI enemyAI;
@@ -66,10 +70,27 @@ public class EnemyHealth : MonoBehaviour
         isDead = true;
         SetGameplayEnabled(false);
 
+        TryDropItem();
+
         if (deathRoutine != null)
             StopCoroutine(deathRoutine);
 
         deathRoutine = StartCoroutine(DeactivateAfterFlash());
+    }
+    private void TryDropItem()
+    {
+        if (dropPrefab == null)
+            return;
+
+        float roll = Random.Range(0f, 100f);
+
+        if (roll <= dropChance)
+        {
+            Instantiate(
+                dropPrefab,
+                transform.position,
+                Quaternion.identity);
+        }
     }
 
     private IEnumerator DeactivateAfterFlash()
